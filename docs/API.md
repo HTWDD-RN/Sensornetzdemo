@@ -56,4 +56,9 @@ SWITCH:
 		"value": 0
 	}
 
+	response:
+	{
+		"value": 0
+	}
+
 ```

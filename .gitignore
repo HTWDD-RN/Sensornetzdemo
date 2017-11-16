@@ -1,7 +1,7 @@
 # Frontend
 # dependencies
 /Frontend/node_modules
-/Backend/node_modules
+/Frontend-Service/node_modules
 
 # built site
 /Frontend/build

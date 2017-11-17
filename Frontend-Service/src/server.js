@@ -7,6 +7,12 @@ app.use(bodyParser.json());
 
 var routes = require('./routes/helperRoutes');
 routes(app);
+// middleware for header modification
+app.use((req, res, next) => {
+    // we need to allow all subdomains
+    res.set('Access-Control-Allow-Origin', '*');
+    next();
+});
 app.use(function (req, res) {
     res.status(404).send({ url: req.originalUrl + ' not found' });
 });

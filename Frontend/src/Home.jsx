@@ -4,10 +4,10 @@ import ApiClient from './Models/APIClient';
 
 export default class Home extends Component {
 
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
 
-        this.client = new ApiClient('http://localhost:4000');
+        this.client = new ApiClient(this.props.baseUrl);
 
         this.state = {
             items: []

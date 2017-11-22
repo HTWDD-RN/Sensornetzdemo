@@ -72,7 +72,7 @@ exports.get_resource = function (req, res) {
 exports.update_resource = function (req, res) {
     const resourceId = req.params.resourceId;
     const actionId = req.params.actionId;
-    const value = req.body.value;
+    const value = parseInt(req.body.value);
     if (!value) {
         res.status(400).send({ message: "No value provided" });
         return;

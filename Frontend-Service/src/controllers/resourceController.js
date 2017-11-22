@@ -73,12 +73,14 @@ exports.update_resource = function (req, res) {
     const resourceId = req.params.resourceId;
     const actionId = req.params.actionId;
     const value = parseInt(req.body.value);
-    if (!value) {
-        res.status(400).send({ message: "No value provided" });
-        return;
-    }
-    if (value != 0 && value != 1) {
-        res.status(400).send({ message: "Provide valid value [0,1]" });
+    if (isNaN(value) || (value != 0 && value != 1)) {
+        var message = "Non-numeric value";
+        if (!req.body.value) {
+            message = "No value";
+        } else if (!isNaN(value)) {
+            message = "Provide valid value: [0,1]"
+        }
+        res.status(400).send({ message: message });
         return;
     }
     const resource = findResourceById(resourceId);

@@ -13,8 +13,10 @@ export default class ListEntry extends Component {
 
         return (
         <div>
+            <li>
             {this.props.resource.name}
             {actions}
+            </li>
         </div>
         );
     }

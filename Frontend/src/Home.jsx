@@ -34,9 +34,7 @@ export default class Home extends Component {
             <button onClick={this.reloadAllSensors.bind(this)}>Reload</button>
             {loadingIndicator}
             <ul>
-                <li>
-                    {entries}
-                </li>
+                {entries}
             </ul>
         </div>
         );

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ListEntry from './Components/ListEntry'
 import ApiClient from './Models/APIClient';
+import LoadingIndicator from 'react-loading-indicator';
 
 export default class Home extends Component {
 
@@ -10,7 +11,8 @@ export default class Home extends Component {
         this.client = new ApiClient(this.props.baseUrl);
 
         this.state = {
-            items: []
+            items: [],
+            loading: false
         }
     }
 
@@ -25,10 +27,12 @@ export default class Home extends Component {
                 resource={n} 
                 client={this.client}/>)
 
+        const loadingIndicator = this.state.loading ? <LoadingIndicator /> : null;
+
         return (
         <div>
             <button onClick={this.reloadAllSensors.bind(this)}>Reload</button>
-            <div className="loader"></div> 
+            {loadingIndicator}
             <ul>
                 <li>
                     {entries}
@@ -44,10 +48,12 @@ export default class Home extends Component {
     }
 
     reloadAllSensors() {
+        this.setState({loading: true});
         this.client.allResources()
         .catch(err => alert(err))
         .then(res => this.setState({
-            items: res || []
+            items: res || [],
+            loading: false
         }));
     }
 

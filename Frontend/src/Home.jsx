@@ -19,13 +19,20 @@ export default class Home extends Component {
     }
 
     render() {
-        const entries = this.state.items.map(n => <ListEntry key={n} number={n}/>)
+        const entries = this.state.items.map(n => 
+            <ListEntry 
+                key={n.id} 
+                resource={n} 
+                client={this.client}/>)
 
         return (
         <div>
-            <button onClick={this.reloadAllSensors.bind(this)}>HELLO!</button>
+            <button onClick={this.reloadAllSensors.bind(this)}>Reload</button>
+            <div className="loader"></div> 
             <ul>
-                {entries}
+                <li>
+                    {entries}
+                </li>
             </ul>
         </div>
         );
@@ -34,12 +41,6 @@ export default class Home extends Component {
     buttonClicked() {
         const newItems = this.state.items.concat([this.randomNumber()])
         this.setState({items: newItems})
-    }
-
-    randomNumber() {
-        let arr = new Int32Array(1);
-        window.crypto.getRandomValues(arr);
-        return arr[0];
     }
 
     reloadAllSensors() {

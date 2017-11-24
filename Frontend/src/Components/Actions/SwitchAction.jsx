@@ -17,7 +17,7 @@ export default class SwitchAction extends Component {
             {action.name}: 
             <input 
                 ref="switch" 
-                checked={ action.parameter.current } 
+                checked={ action.parameter.current === action.parameter.on } 
                 onChange={this._onChange.bind(this)}
                 className="switch" 
                 type="checkbox" />

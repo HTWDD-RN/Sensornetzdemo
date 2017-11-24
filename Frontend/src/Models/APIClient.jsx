@@ -1,7 +1,5 @@
 function url(path) {
-    const result = this.baseUrl + path;
-    console.log(result);
-    return result;
+    return this.baseUrl + path;
 }
 
 const Path = {
@@ -42,7 +40,6 @@ export default class APIClient {
             }
         })
         .then(res => res.json())
-        .then(res => res);
     }
 
 }

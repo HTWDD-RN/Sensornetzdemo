@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import ListEntry from './Components/ListEntry'
 import ApiClient from './Models/APIClient';
-import LoadingIndicator from 'react-loading-indicator';
+import './Home.css';
 
 export default class Home extends Component {
 
@@ -27,25 +27,27 @@ export default class Home extends Component {
                 resource={n} 
                 client={this.client}/>)
 
-        const loadingIndicator = this.state.loading ? <LoadingIndicator /> : null;
-
         return (
-        <div>
-            <button onClick={this.reloadAllSensors.bind(this)}>Reload</button>
-            {loadingIndicator}
-            <ul>
-                {entries}
-            </ul>
+        <div className='container'>
+            <div className='navBar'>
+                <p>Sensornetze Demo</p>
+                <button
+                    className={this.state.loading ? 'button disabled' : 'button'}
+                    onClick={this.reloadAllSensors.bind(this)}>Neu Laden
+                </button>
+            </div>
+            <div>
+                <ul>
+                    {entries}
+                </ul>
+            </div>
         </div>
         );
     }
 
-    buttonClicked() {
-        const newItems = this.state.items.concat([this.randomNumber()])
-        this.setState({items: newItems})
-    }
-
     reloadAllSensors() {
+        if (this.state.loading) return;
+
         this.setState({loading: true});
         this.client.allResources()
         .catch(err => alert(err))

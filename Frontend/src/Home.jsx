@@ -18,6 +18,8 @@ export default class Home extends Component {
 
     componentDidMount() {
         this.reloadAllSensors();
+
+        setInterval(this.reloadAllSensors.bind(this), 500);
     }
 
     render() {

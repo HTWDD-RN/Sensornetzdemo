@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Action from './Action';
+import './ListEntry.css';
 
 export default class ListEntry extends Component {
 
@@ -14,11 +15,9 @@ export default class ListEntry extends Component {
                 />);
 
         return (
-        <div>
-            <li>
-            {this.props.resource.name}
+        <div className='entry'>
+            <p className='title'>{this.props.resource.name}</p>
             {actions}
-            </li>
         </div>
         );
     }

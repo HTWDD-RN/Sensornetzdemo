@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import Switch from 'react-ios-switch';
+import './SwitchAction.css';
 
 export default class SwitchAction extends Component {
 
@@ -8,12 +10,10 @@ export default class SwitchAction extends Component {
         return (
         <div>
             {action.name}: 
-            <input 
-                ref="switch" 
-                checked={ action.parameter.current === action.parameter.on } 
+            <Switch 
+                checked={ action.parameter.current === action.parameter.on }
                 onChange={this._onChange.bind(this)}
-                className="switch" 
-                type="checkbox" />
+            />
         </div>
     );}
 

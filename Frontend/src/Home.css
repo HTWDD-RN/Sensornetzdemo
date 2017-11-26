@@ -25,3 +25,10 @@ button {
     font-size: 16px;
     height: 100%;
 }
+
+.collection {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}

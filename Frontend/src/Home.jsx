@@ -37,10 +37,8 @@ export default class Home extends Component {
                     onClick={this.reloadAllSensors.bind(this)}>Neu Laden
                 </button>
             </div>
-            <div>
-                <ul>
-                    {entries}
-                </ul>
+            <div className='collection'>
+                {entries}
             </div>
         </div>
         );

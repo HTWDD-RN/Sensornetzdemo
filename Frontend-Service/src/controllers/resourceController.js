@@ -14,6 +14,16 @@ const r1 = {
                 on: 1,
                 off: 0
             }
+        },
+        {
+            id: "led_a_2",
+            name: "blau / rot schalten",
+            type: "SWITCH",
+            parameter: {
+                current: 1,
+                on: 0,
+                off: 1
+            }
         }
     ]
 };

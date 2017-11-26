@@ -32,7 +32,6 @@ export default class Home extends Component {
             <div className='navBar'>
                 <p>Sensornetze Demo</p>
                 <button
-                    className={this.state.loading ? 'button disabled' : 'button'}
                     onClick={this.reloadAllSensors.bind(this)}>Neu Laden
                 </button>
             </div>

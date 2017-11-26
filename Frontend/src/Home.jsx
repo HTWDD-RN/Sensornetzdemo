@@ -21,11 +21,13 @@ export default class Home extends Component {
     }
 
     render() {
-        const entries = this.state.items.map(n => 
+        const entries = this.state.items.map((n, i) => 
             <ListEntry 
                 key={n.id} 
                 resource={n} 
-                client={this.client}/>)
+                client={this.client}
+                actionChanged={a => this.actionChanged(a, i)}
+                />)
 
         return (
         <div className='container'>
@@ -44,16 +46,24 @@ export default class Home extends Component {
         );
     }
 
+    actionChanged(action, i) {
+        let items = this.state.items;
+        items[i].action = action;
+        this.setState({
+            items: items
+        });
+    }
+
     reloadAllSensors() {
         if (this.state.loading) return;
 
         this.setState({loading: true});
         this.client.allResources()
-        .catch(err => alert(err))
-        .then(res => this.setState({
-            items: res || [],
-            loading: false
-        }));
+            .catch(err => alert(err))
+            .then(res => this.setState({
+                items: res,
+                loading: false
+            }));
     }
 
 }

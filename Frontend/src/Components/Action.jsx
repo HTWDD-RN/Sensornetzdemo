@@ -15,8 +15,9 @@ export default function Action(props) {
     const action = props.action;
     const client = props.client;
     const id = props.id;
+    const actionChanged = props.actionChanged;
     switch (action.type) {
-        case 'SWITCH': return <SwitchAction action={action} id={id} client={client} />;
+        case 'SWITCH': return <SwitchAction action={action} id={id} client={client} actionChanged={actionChanged}/>;
         default: return <ErrorActionComponent action={action} />;
     }
 }

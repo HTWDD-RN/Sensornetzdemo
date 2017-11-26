@@ -2,15 +2,8 @@ import React, { Component } from 'react';
 
 export default class SwitchAction extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            action: props.action
-        }
-    }
-
     render() {
-        const action = this.state.action;
+        const action = this.props.action;
 
         return (
         <div>
@@ -25,15 +18,15 @@ export default class SwitchAction extends Component {
     );}
 
     _onChange() {
-        const on = this.state.action.parameter.on;
-        const off = this.state.action.parameter.off;
-        const newValue = this.state.action.parameter.current === on ? off : on;
+        const on = this.props.action.parameter.on;
+        const off = this.props.action.parameter.off;
+        const newValue = this.props.action.parameter.current === on ? off : on;
 
-        this.props.client.setStatus(this.props.id, this.state.action.id, newValue)
+        this.props.client.setStatus(this.props.id, this.props.action.id, newValue)
             .then(res => {
-                let action = this.state.action;
+                let action = this.props.action;
                 action.parameter.current = res.value;
-                this.setState({action: action})
+                this.props.actionChanged(action);
             })
     }
 }

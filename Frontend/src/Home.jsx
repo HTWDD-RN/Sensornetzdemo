@@ -59,7 +59,7 @@ export default class Home extends Component {
         this.client.allResources()
             .catch(err => alert(err))
             .then(res => this.setState({
-                items: res,
+                items: res || [],
                 loading: false
             }));
     }

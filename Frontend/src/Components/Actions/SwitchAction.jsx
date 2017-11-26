@@ -8,12 +8,12 @@ export default class SwitchAction extends Component {
         const action = this.props.action;
 
         return (
-        <div>
-            {action.name}: 
-            <Switch 
-                checked={ action.parameter.current === action.parameter.on }
-                onChange={this._onChange.bind(this)}
-            />
+        <div className='switch-container'>
+            <p>{action.name}: <Switch 
+                                    className='switch'
+                                    checked={ action.parameter.current === action.parameter.on }
+                                    onChange={this._onChange.bind(this)}
+            /></p>
         </div>
     );}
 

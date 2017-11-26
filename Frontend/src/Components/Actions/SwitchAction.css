@@ -1,3 +1,14 @@
+.switch-container {
+    display: flex;
+}
+
+.switch-container p {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .switch {
-    
+    margin-left: 8px;
 }

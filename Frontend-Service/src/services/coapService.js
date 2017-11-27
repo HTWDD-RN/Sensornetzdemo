@@ -60,14 +60,18 @@ exports.get = function (host, pathname, success, fail) {
  * @param {string} host 
  * @param {string} pathname 
  * @param {string} payload
+ * @param {string} contentFormat
  * @param {function} success success callback, takes two parameters dataType (one of following: 'plain', 'json') and responsePayload
  * @param {function} fail 
  */
-exports.post = function (host, pathname, payload, success, fail) {
+exports.post = function (host, pathname, payload, contentFormat, success, fail) {
     const url = {
         host: host,
         pathname: pathname,
-        method: "POST"
+        method: "POST",
+        headers: {
+            'Content-Format': contentFormat || 'text/plain'
+        }
     };
     const req = coap.request(url);
     req.on('response', function (res) {

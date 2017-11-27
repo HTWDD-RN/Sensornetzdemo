@@ -11,14 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
-<<<<<<< HEAD
     "coap": "^0.21.0",
     "coap-packet": "^0.1.14",
+    "cors": "^2.8.4",
     "express": "^4.16.2",
     "stringify-buffer": "^1.1.0"
-=======
-    "cors": "^2.8.4",
-    "express": "^4.16.2"
->>>>>>> c05d02648a305b0f67ff63fca1b4029fee4a6f3f
   }
 }

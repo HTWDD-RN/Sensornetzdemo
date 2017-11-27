@@ -1,7 +1,5 @@
 function url(path) {
-    const result = this.baseUrl + path;
-    console.log(result);
-    return result;
+    return this.baseUrl + path;
 }
 
 const Path = {
@@ -33,11 +31,15 @@ export default class APIClient {
     setStatus(id, action, value) {
         const resolvedUrl = url.bind(this)(Path.setStatus(id, action));
         return fetch(resolvedUrl, {
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify({
                 value: value
-            })
-        });
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
     }
 
 }

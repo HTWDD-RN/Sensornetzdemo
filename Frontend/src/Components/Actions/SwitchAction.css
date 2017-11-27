@@ -1,0 +1,17 @@
+.switch-container {
+    display: flex;
+}
+
+.switch-container p {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 16px;
+    margin: 6px;
+}
+
+.switch {
+    margin-left: 8px;
+}

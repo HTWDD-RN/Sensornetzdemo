@@ -1,6 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import ListEntry from './Components/ListEntry'
 import ApiClient from './Models/APIClient';
+import './Home.css';
 
 export default class Home extends Component {
 
@@ -10,44 +11,59 @@ export default class Home extends Component {
         this.client = new ApiClient(this.props.baseUrl);
 
         this.state = {
-            items: []
+            items: [],
+            loading: false
         }
     }
 
     componentDidMount() {
         this.reloadAllSensors();
+
+        setInterval(this.reloadAllSensors.bind(this), 500);
     }
 
     render() {
-        const entries = this.state.items.map(n => <ListEntry key={n} number={n}/>)
+        const entries = this.state.items.map((n, i) => 
+            <ListEntry 
+                key={n.id} 
+                resource={n} 
+                client={this.client}
+                actionChanged={a => this.actionChanged(a, i)}
+                />)
 
         return (
-        <div>
-            <button onClick={this.reloadAllSensors.bind(this)}>HELLO!</button>
-            <ul>
+        <div className='container'>
+            <div className='navBar'>
+                <p>Sensornetze Demo</p>
+                <button
+                    onClick={this.reloadAllSensors.bind(this)}>Neu Laden
+                </button>
+            </div>
+            <div className='collection'>
                 {entries}
-            </ul>
+            </div>
         </div>
         );
     }
 
-    buttonClicked() {
-        const newItems = this.state.items.concat([this.randomNumber()])
-        this.setState({items: newItems})
-    }
-
-    randomNumber() {
-        let arr = new Int32Array(1);
-        window.crypto.getRandomValues(arr);
-        return arr[0];
+    actionChanged(action, i) {
+        let items = this.state.items;
+        items[i].action = action;
+        this.setState({
+            items: items
+        });
     }
 
     reloadAllSensors() {
+        if (this.state.loading) return;
+
+        this.setState({loading: true});
         this.client.allResources()
-        .catch(err => alert(err))
-        .then(res => this.setState({
-            items: res || []
-        }));
+            .catch(err => alert(err))
+            .then(res => this.setState({
+                items: res || [],
+                loading: false
+            }));
     }
 
 }

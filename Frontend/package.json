@@ -2,9 +2,11 @@
   "name": "sensornetz-frontend",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://benchr.de/sensornetze",
   "dependencies": {
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-ios-switch": "^0.1.19",
     "react-scripts": "1.0.17"
   },
   "scripts": {

@@ -11,6 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
-    "express": "^4.16.2"
+    "coap": "^0.21.0",
+    "coap-packet": "^0.1.14",
+    "express": "^4.16.2",
+    "stringify-buffer": "^1.1.0"
   }
 }

@@ -1,13 +1,14 @@
 'use strict';
 const coap = require('coap');
 const stringifyBuffer = require('stringify-buffer');
+const parseLinkFormat = require("../utils/linkFormatParser").parse;
 
 const processPayload = function (payload, contentFormat) {
     const strPayload = stringifyBuffer(payload).binary;
     const type = contentFormat == "application/link-format" || contentFormat == "application/json" ? "json" : "plain";
     var data = strPayload;
     if (contentFormat == "application/link-format") {
-        //TODO: parse payload
+        data = parseLinkFormat(data);
     } else if (contentFormat == "application/json") {
         try {
             data = JSON.parse(strPayload);
@@ -19,6 +20,14 @@ const processPayload = function (payload, contentFormat) {
         type: type,
         data: data
     };
+}
+
+const getContentFormat = function (options) {
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].name == "Content-Format") {
+            return options[i].value;
+        }
+    }
 }
 
 /**
@@ -36,7 +45,7 @@ exports.get = function (host, pathname, success, fail) {
         pathname: pathname
     };
     coap.request(url).on('response', function (res) {
-        const data = processPayload(res.payload, res.options['Content-Format']);// stringifyBuffer(res.payload).binary;
+        const data = processPayload(res.payload, getContentFormat(res.options));
         if (success && typeof success == "function") {
             success(data.type, data.data);
         }
@@ -62,7 +71,7 @@ exports.post = function (host, pathname, payload, success, fail) {
     };
     const req = coap.request(url);
     req.on('response', function (res) {
-        const data = processPayload(res.payload, res.options['Content-Format']);// stringifyBuffer(res.payload).binary;
+        const data = processPayload(res.payload, getContentFormat(res.options));
         if (success && typeof success == "function") {
             success(data.type, data.data);
         }

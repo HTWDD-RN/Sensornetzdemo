@@ -1,5 +1,7 @@
 'use strict';
 
+//TODO: parse according to https://www2.htw-dresden.de/~jvogt/forschungsseminar/Abschlussbericht_bohnet_baumgaertel.pdf page 22
+
 const parseResource = function (item) {
     const data = {};
     const fields = item.split(";");
@@ -43,9 +45,12 @@ const parseUrl = function (urlField) {
 
 exports.parse = function (data) {
     const response = [];
-    const resources = data.split(",");
+    const resources = data.split(",<");
     for (var i = 0; i < resources.length; i++) {
         var item = resources[i];
+        if (!item.startsWith("<")) {
+            item = "<" + item;
+        }
         response.push(parseResource(item));
     }
     return response;

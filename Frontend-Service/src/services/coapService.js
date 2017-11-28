@@ -41,7 +41,7 @@ const getContentFormat = function (options) {
  */
 exports.get = function (host, pathname, success, fail) {
     const url = {
-        host: host,
+        hostname: host,
         pathname: pathname
     };
     coap.request(url).on('response', function (res) {
@@ -66,7 +66,7 @@ exports.get = function (host, pathname, success, fail) {
  */
 exports.post = function (host, pathname, payload, contentFormat, success, fail) {
     const url = {
-        host: host,
+        hostname: host,
         pathname: pathname,
         method: "POST",
         headers: {

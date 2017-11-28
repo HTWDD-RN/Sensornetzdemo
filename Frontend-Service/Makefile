@@ -13,4 +13,4 @@ build:
 
 run:
 	$(info Run the docker container…)
-	docker run -it --rm -p 5238:5238 --name $(INSTANCE_NAME) $(CONTAINER_NAME)
+	docker run -it --rm --net=host -p 5238:5238 -p 5683:5683 --name $(INSTANCE_NAME) $(CONTAINER_NAME)

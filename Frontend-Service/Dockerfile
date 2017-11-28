@@ -12,6 +12,9 @@ RUN npm install
 # Bundle app source
 COPY . .
 EXPOSE 5238
+EXPOSE 5683
+
+ENV IP_ADDRESS "2001:db8::5855:1277:fb88:4f1e"
 
 CMD ["npm", "start"]
 

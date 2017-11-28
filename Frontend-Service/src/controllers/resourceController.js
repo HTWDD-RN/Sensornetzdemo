@@ -2,7 +2,7 @@
 
 const ipAddress = process.env.IP_ADDRESS || 'vs0.inf.ethz.ch';
 
-const coapService = require('./services/coapService');
+const coapService = require('../services/coapService');
 
 const r1 = {
     id: "led_a",

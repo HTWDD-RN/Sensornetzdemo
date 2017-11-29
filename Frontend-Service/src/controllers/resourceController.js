@@ -1,18 +1,20 @@
 'use strict';
 
-const ipAddress = process.env.IP_ADDRESS || 'vs0.inf.ethz.ch';
+const ipAddress = "2001:db8::5855:1277:fb88:4f1e";
 
-const coapService = require('../services/coapService');
+const resourceService = require('../services/resourceService');
 
 const r1 = {
     id: "led_a",
     name: "Node A (LED)",
     state: "OPEN",
+    ip: "2001:db8::5855:1277:fb88:4f1e",
     actions: [
         {
             id: "led_a_1",
-            name: "an-/ausschalten",
+            name: "Grüne LED",
             type: "SWITCH",
+            actionPath: '/LED/green',
             parameter: {
                 current: 1,
                 on: 1,
@@ -21,8 +23,9 @@ const r1 = {
         },
         {
             id: "led_a_2",
-            name: "blau / rot schalten",
+            name: "Rote LED",
             type: "SWITCH",
+            actionPath: '/LED/red',
             parameter: {
                 current: 1,
                 on: 0,
@@ -51,7 +54,7 @@ const r2 = {
 };
 
 const resources = [
-    r1, r2
+    r1
 ];
 
 const findResourceById = function (id) {
@@ -84,8 +87,6 @@ exports.get_resource = function (req, res) {
 };
 
 exports.update_resource = function (req, res) {
-    coapService.post(ipAddress, '/LED/green', "", undefined, console.log, console.log);
-    
     const resourceId = req.params.resourceId;
     const actionId = req.params.actionId;
     const value = parseInt(req.body.value);
@@ -106,8 +107,10 @@ exports.update_resource = function (req, res) {
         for (var i = 0; i < resource.actions.length; i++) {
             const action = resource.actions[i];
             if (action.id == actionId) {
-                action.parameter.current = value;
-                res.json({ value: action.parameter.current });
+                resourceService.setState(resource.ip, action.actionPath, value.toString(), data => {
+                    action.parameter.current = data;
+                    res.json({ value: action.parameter.current });
+                });
                 return;
             }
         }

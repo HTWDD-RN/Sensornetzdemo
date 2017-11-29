@@ -1,5 +1,9 @@
 'use strict';
 
+const ipAddress = process.env.IP_ADDRESS || 'vs0.inf.ethz.ch';
+
+const coapService = require('../services/coapService');
+
 const r1 = {
     id: "led_a",
     name: "Node A (LED)",
@@ -80,6 +84,8 @@ exports.get_resource = function (req, res) {
 };
 
 exports.update_resource = function (req, res) {
+    coapService.post(ipAddress, '/LED/green', "", undefined, console.log, console.log);
+    
     const resourceId = req.params.resourceId;
     const actionId = req.params.actionId;
     const value = parseInt(req.body.value);

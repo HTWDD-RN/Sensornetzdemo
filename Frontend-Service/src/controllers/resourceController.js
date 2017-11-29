@@ -108,7 +108,7 @@ exports.update_resource = function (req, res) {
             const action = resource.actions[i];
             if (action.id == actionId) {
                 resourceService.setState(resource.ip, action.actionPath, value.toString(), data => {
-                    action.parameter.current = data;
+                    action.parameter.current = parseInt(data);
                     res.json({ value: action.parameter.current });
                 });
                 return;
@@ -124,7 +124,7 @@ exports.start = function () {
         for (var j = 0; j < res.actions.length; j++) {
             const action = res.actions[j];
             resourceService.setState(res.ip, action.actionPath, "1", data => {
-                action.parameter.current = data;
+                action.parameter.current = parseInt(data);
             });
         }
     }

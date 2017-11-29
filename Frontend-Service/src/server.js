@@ -2,6 +2,7 @@ var cors = require('cors');
 var app = require('./app');
 var port = process.env.PORT || 5238;
 var bodyParser = require('body-parser');
+var resourceController = require('./controllers/resourceController');
 
 // allow all origins
 app.use(cors());
@@ -15,5 +16,7 @@ app.use(function (req, res) {
     res.status(404).send({ url: req.originalUrl + ' not found' });
 });
 
+resourceController.start();
+
 app.listen(port,
-    console.log.bind(this,"Sensornetzdemo REST API server started on port", port));
+    console.log.bind(this, "Sensornetzdemo REST API server started on port", port));

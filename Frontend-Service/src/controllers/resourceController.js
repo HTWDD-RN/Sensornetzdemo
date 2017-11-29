@@ -117,3 +117,15 @@ exports.update_resource = function (req, res) {
         res.status(400).send({ message: "Action " + actionId + " does not exist (resourceId: " + resourceId + ")" })
     }
 };
+
+exports.start = function () {
+    for (var i = 0; i < resources.length; i++) {
+        const res = resources[i];
+        for (var j = 0; j < res.actions.length; j++) {
+            const action = res.actions[j];
+            resourceService.setState(res.ip, action.actionPath, "1", data => {
+                action.parameter.current = data;
+            });
+        }
+    }
+}

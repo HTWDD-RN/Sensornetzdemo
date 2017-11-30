@@ -16,7 +16,8 @@ app.use(function (req, res) {
     res.status(404).send({ url: req.originalUrl + ' not found' });
 });
 
-resourceController.start();
-
-app.listen(port,
-    console.log.bind(this, "Sensornetzdemo REST API server started on port", port));
+resourceController.start(() => {
+    console.log("Turned all LEDs off and updated state.");
+    app.listen(port,
+        console.log.bind(this, "REST API server started on port", port));
+});

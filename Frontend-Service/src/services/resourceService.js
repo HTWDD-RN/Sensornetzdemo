@@ -8,5 +8,6 @@ exports.setState = function (ip, actionPath, payload, callback) {
             callback(data);
         }
     }
+
     coap.post(ip, actionPath, payload, undefined, success, success);
 };

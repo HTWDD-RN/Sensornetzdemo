@@ -104,8 +104,7 @@ exports.update_resource = function (req, res) {
     if (!resource) {
         sendResourceNotFoundResponse(res, resourceId);
     } else {
-        for (var i = 0; i < resource.actions.length; i++) {
-            const action = resource.actions[i];
+        for (let action of resource.actions) {
             if (action.id == actionId) {
                 resourceService.setState(resource.ip, action.actionPath, value.toString(), data => {
                     action.parameter.current = parseInt(data);
@@ -118,14 +117,42 @@ exports.update_resource = function (req, res) {
     }
 };
 
-exports.start = function () {
-    for (var i = 0; i < resources.length; i++) {
-        const res = resources[i];
-        for (var j = 0; j < res.actions.length; j++) {
-            const action = res.actions[j];
-            resourceService.setState(res.ip, action.actionPath, "1", data => {
-                action.parameter.current = parseInt(data);
+function setInitialState(objs, state, completion) {
+    if (objs.length == 0)
+    {
+        console.log(JSON.stringify(resources));
+        completion();
+        return;
+    }
+
+    const obj = objs[0];
+    resourceService.setState(obj.ip, obj.action.actionPath, state, data => {
+        const resource = findResourceById(obj.resourceId);
+        if (resource != undefined)
+        {
+            for (let action of resource.actions)
+            {
+                if (action.id === obj.action.id)
+                {
+                    action.parameter.current = data;
+                }
+            }
+        }
+        const rest = objs.slice(1);
+        setInitialState(rest, state, completion);
+    })
+}
+
+exports.start = function (completion) {
+    let objs = []
+    for (let res of resources) {
+        for (let action of res.actions) {
+            objs.push({
+                resourceId: res.id,
+                ip: res.ip,
+                action: action
             });
         }
     }
+    setInitialState(objs, "0", completion);
 }

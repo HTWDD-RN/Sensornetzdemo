@@ -80,8 +80,14 @@ exports.post = function (host, pathname, payload, contentFormat, success, fail) 
             success(data.type, data.data);
         }
     });
+    req.on('error', (err) => {
+        console.log(err, pathname);
+        if (fail && typeof fail == "function") {
+            fail(err);
+            process.exit(-1);
+        }
+    });
     req.write(payload);
     req.end();
-    //TODO: on fail
 
 };

@@ -135,6 +135,7 @@ function setInitialState(objs, state, completion) {
                 if (action.id === obj.action.id)
                 {
                     action.parameter.current = data;
+                    break;
                 }
             }
         }

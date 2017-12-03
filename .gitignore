@@ -21,5 +21,7 @@ yarn-debug.log*
 yarn-error.log*
 
 #riot-examples
-riot/microCoapTwoLEDs/bin
-riot/microCoapTwoLEDs/.*
+riot/microCoapTwoLEDs/myCoapServer/.metadata/
+riot/microCoapTwoLEDs/myCoapServer/bin/
+riot/microCoapTwoLEDs/myCoapServer/.idea/
+

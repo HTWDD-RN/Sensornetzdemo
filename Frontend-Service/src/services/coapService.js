@@ -3,6 +3,8 @@ const coap = require('coap');
 const stringifyBuffer = require('stringify-buffer');
 const parseLinkFormat = require("../utils/linkFormatParser").parse;
 
+/* Helpers */
+
 const processPayload = function (payload, contentFormat) {
     const strPayload = stringifyBuffer(payload).binary;
     const type = contentFormat == "application/link-format" || contentFormat == "application/json" ? "json" : "plain";
@@ -30,6 +32,8 @@ const getContentFormat = function (options) {
     }
 }
 
+/* API */
+
 /**
  * 
  * Send get request
@@ -49,8 +53,13 @@ exports.get = function (host, pathname, success, fail) {
         if (success && typeof success == "function") {
             success(data.type, data.data);
         }
+    }).on('error', (err) => {
+        console.log(err, pathname);
+        if (fail && typeof fail == "function") {
+            fail(err);
+            process.exit(-1);
+        }
     }).end();
-    //TODO: on fail
 };
 
 /**
@@ -89,5 +98,8 @@ exports.post = function (host, pathname, payload, contentFormat, success, fail) 
     });
     req.write(payload);
     req.end();
+};
 
+exports.discover = function (host, success, fail) {
+    this.get(host, "/.well-known/core", success, fail);
 };

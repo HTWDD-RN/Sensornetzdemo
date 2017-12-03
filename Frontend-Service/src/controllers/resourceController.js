@@ -1,7 +1,5 @@
 'use strict';
 
-const ipAddress = "2001:db8::5855:1277:fb88:4f1e";
-
 const resourceService = require('../services/resourceService');
 
 const r1 = {
@@ -118,8 +116,7 @@ exports.update_resource = function (req, res) {
 };
 
 function setInitialState(objs, state, completion) {
-    if (objs.length == 0)
-    {
+    if (objs.length == 0) {
         console.log(JSON.stringify(resources));
         completion();
         return;
@@ -128,12 +125,9 @@ function setInitialState(objs, state, completion) {
     const obj = objs[0];
     resourceService.setState(obj.ip, obj.action.actionPath, state, data => {
         const resource = findResourceById(obj.resourceId);
-        if (resource != undefined)
-        {
-            for (let action of resource.actions)
-            {
-                if (action.id === obj.action.id)
-                {
+        if (resource != undefined) {
+            for (let action of resource.actions) {
+                if (action.id === obj.action.id) {
                     action.parameter.current = data;
                     break;
                 }
@@ -141,11 +135,11 @@ function setInitialState(objs, state, completion) {
         }
         const rest = objs.slice(1);
         setInitialState(rest, state, completion);
-    })
+    });
 }
 
 exports.start = function (completion) {
-    let objs = []
+    let objs = [];
     for (let res of resources) {
         for (let action of res.actions) {
             objs.push({
@@ -156,4 +150,4 @@ exports.start = function (completion) {
         }
     }
     setInitialState(objs, "0", completion);
-}
+};

@@ -2,18 +2,12 @@
 
 const coap = require('./coapService');
 
-exports.setState = function (ip, actionPath, payload, callback) {
-    const success = (dataType, data) => {
-        if (callback && typeof callback == 'function') {
-            callback(data);
-        }
-    }
-    const fail = (err) => {
-        if (callback && typeof callback == 'function') {
-            // TODO: We might need to give a fallback or something
-            callback(payload);
+exports.setState = function (ip, actionPath, payload, success, fail) {
+    const successWrapper = (dataType, data) => {
+        if (success && typeof success == 'function') {
+            success(data);
         }
     }
 
-    coap.post(ip, actionPath, payload, undefined, success, fail);
+    coap.post(ip, actionPath, payload, undefined, successWrapper, fail);
 };

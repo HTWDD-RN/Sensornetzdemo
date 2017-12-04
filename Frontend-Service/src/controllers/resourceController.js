@@ -1,18 +1,22 @@
 'use strict';
 
 const resourceService = require('../services/resourceService');
+const events = require('events');
+const eventEmitter = new events.EventEmitter();
 
 const r1 = {
     id: "led_a",
     name: "Node A (LED)",
     state: "OPEN",
     ip: "2001:db8::5855:1277:fb88:4f1e",
+    // ip: "vs0.inf.ethz.ch",
     actions: [
         {
             id: "led_a_1",
             name: "Grüne LED",
             type: "SWITCH",
             actionPath: '/LED/green',
+            // actionPath: '/large-post',
             parameter: {
                 current: 1,
                 on: 1,
@@ -24,6 +28,7 @@ const r1 = {
             name: "Rote LED",
             type: "SWITCH",
             actionPath: '/LED/red',
+            // actionPath: '/large-post',
             parameter: {
                 current: 1,
                 on: 0,
@@ -107,7 +112,8 @@ exports.update_resource = function (req, res) {
                 resourceService.setState(resource.ip, action.actionPath, value.toString(), data => {
                     action.parameter.current = parseInt(data);
                     res.json({ value: action.parameter.current });
-                });
+                    eventEmitter.emit('update', resources);
+                }, console.log.bind(this, "Could not update state."));
                 return;
             }
         }
@@ -116,7 +122,7 @@ exports.update_resource = function (req, res) {
 };
 
 function setInitialState(objs, state, completion) {
-    if (objs.length == 0) {
+    if (objs.length == 0) { 
         console.log(JSON.stringify(resources));
         completion();
         return;
@@ -151,3 +157,7 @@ exports.start = function (completion) {
     }
     setInitialState(objs, "0", completion);
 };
+
+exports.on = function (eventKey, callback) {
+    eventEmitter.on(eventKey, callback);
+}

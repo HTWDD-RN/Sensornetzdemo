@@ -59,6 +59,12 @@ exports.get = function (host, pathname, success, fail) {
             fail(err);
             process.exit(-1);
         }
+    }).on('timeout',(err)=>{
+        console.log(err, pathname);
+        if (fail && typeof fail == "function") {
+            fail(err);
+            process.exit(-1);
+        }
     }).end();
 };
 
@@ -96,6 +102,13 @@ exports.post = function (host, pathname, payload, contentFormat, success, fail) 
             process.exit(-1);
         }
     });
+    req.on('timeout',(err)=>{
+        console.log(err, pathname);
+        if (fail && typeof fail == "function") {
+            fail(err);
+            process.exit(-1);
+        }
+    })
     req.write(payload);
     req.end();
 };

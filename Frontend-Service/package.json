@@ -15,6 +15,8 @@
     "coap-packet": "^0.1.14",
     "cors": "^2.8.4",
     "express": "^4.16.2",
-    "stringify-buffer": "^1.1.0"
+    "http": "0.0.0",
+    "stringify-buffer": "^1.1.0",
+    "ws": "^3.3.2"
   }
 }

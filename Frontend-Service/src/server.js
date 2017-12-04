@@ -3,6 +3,8 @@ var app = require('./app');
 var port = process.env.PORT || 5238;
 var bodyParser = require('body-parser');
 var resourceController = require('./controllers/resourceController');
+var websocketService = require('./services/websocketService');
+const http = require('http');
 
 // allow all origins
 app.use(cors());
@@ -18,6 +20,12 @@ app.use(function (req, res) {
 
 resourceController.start(() => {
     console.log("Turned all LEDs off and updated state.");
-    app.listen(port,
+    resourceController.on("update", function (data) {
+        console.log("Broadcasting", JSON.stringify(data));
+        websocketService.broadcast(JSON.stringify(data));
+    });
+    const server = http.createServer(app);
+    websocketService.init(server);
+    server.listen(port,
         console.log.bind(this, "REST API server started on port", port));
 });

@@ -18,8 +18,6 @@ export default class Home extends Component {
 
     componentDidMount() {
         this.reloadAllSensors();
-
-        setInterval(this.reloadAllSensors.bind(this), 500);
     }
 
     render() {
@@ -64,6 +62,26 @@ export default class Home extends Component {
                 items: res || [],
                 loading: false
             }));
+
+        const ws = new WebSocket("ws://localhost:5238/");
+
+        ws.onmessage = e => {
+
+            this.setState({
+                items: JSON.parse(e.data) || [],
+                loading: false
+            });
+        }
+          
+        ws.onerror = e => {
+            // an error occurred
+            console.log(e.message);
+        };
+        
+        ws.onclose = e => {
+            // connection closed
+            console.log(e.code, e.reason);
+        };
     }
 
 }

@@ -15,8 +15,10 @@ EXPOSE 5238
 EXPOSE 5683
 
 ENV IP_ADDRESS "2001:db8::5855:1277:fb88:4f1e"
+ENV MODE "start"
 
-CMD ["npm", "start"]
+CMD echo ${MODE}
+CMD npm run ${MODE}
 
 # # node.js dependencies
 

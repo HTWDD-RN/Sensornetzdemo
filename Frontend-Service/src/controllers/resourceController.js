@@ -28,8 +28,8 @@ const r1 = {
             actionPath: '/LED/red',
             parameter: {
                 current: 0,
-                on: 0,
-                off: 1
+                on: 1,
+                off: 0
             }
         }
     ]

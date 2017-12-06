@@ -9,16 +9,14 @@ const r1 = {
     name: "Node A (LED)",
     state: "OPEN",
     ip: "2001:db8::5855:1277:fb88:4f1e",
-    // ip: "vs0.inf.ethz.ch",
     actions: [
         {
             id: "led_a_1",
             name: "Grüne LED",
             type: "SWITCH",
             actionPath: '/LED/green',
-            // actionPath: '/large-post',
             parameter: {
-                current: 1,
+                current: 0,
                 on: 1,
                 off: 0
             }
@@ -28,9 +26,8 @@ const r1 = {
             name: "Rote LED",
             type: "SWITCH",
             actionPath: '/LED/red',
-            // actionPath: '/large-post',
             parameter: {
-                current: 1,
+                current: 0,
                 on: 0,
                 off: 1
             }
@@ -48,7 +45,7 @@ const r2 = {
             name: "an-/ausschalten",
             type: "SWITCH",
             parameter: {
-                current: 1,
+                current: 0,
                 on: 1,
                 off: 0
             }
@@ -122,7 +119,7 @@ exports.update_resource = function (req, res) {
 };
 
 function setInitialState(objs, state, completion) {
-    if (objs.length == 0) { 
+    if (objs.length == 0) {
         console.log(JSON.stringify(resources));
         completion();
         return;
@@ -155,7 +152,20 @@ exports.start = function (completion) {
             });
         }
     }
-    setInitialState(objs, "0", completion);
+    const isDebug = process.argv.indexOf("--d") !== -1;
+    console.log(isDebug ? "Debug mode" : "Release mode");
+    if (!isDebug) {
+        setInitialState(objs, "0", completion);
+    } else {
+        for (let res of resources) {
+            resources.ip = "vs0.inf.ethz.ch";
+            for (let action of res.actions) {
+                action.actionPath = "/large-post";
+            }
+        }
+        console.log("Initialized resources to large-post api @ethz.ch");
+        completion();
+    }
 };
 
 exports.on = function (eventKey, callback) {

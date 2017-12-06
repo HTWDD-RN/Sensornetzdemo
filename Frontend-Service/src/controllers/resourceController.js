@@ -106,6 +106,7 @@ exports.update_resource = function (req, res) {
     } else {
         for (let action of resource.actions) {
             if (action.id == actionId) {
+                console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://", resource.ip + action.actionPath);
                 resourceService.setState(resource.ip, action.actionPath, value.toString(), data => {
                     action.parameter.current = parseInt(data);
                     res.json({ value: action.parameter.current });
@@ -152,13 +153,14 @@ exports.start = function (completion) {
             });
         }
     }
-    const isDebug = process.argv.indexOf("--d") !== -1;
-    console.log(isDebug ? "Debug mode" : "Release mode");
-    if (!isDebug) {
+
+    const isDebugMode = process.argv.indexOf("--d") !== -1;
+    console.log(isDebugMode ? "Debug mode" : "Release mode");
+    if (!isDebugMode) {
         setInitialState(objs, "0", completion);
     } else {
         for (let res of resources) {
-            resources.ip = "vs0.inf.ethz.ch";
+            res.ip = "vs0.inf.ethz.ch";
             for (let action of res.actions) {
                 action.actionPath = "/large-post";
             }

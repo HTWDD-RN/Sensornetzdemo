@@ -8,7 +8,7 @@ export default class Home extends Component {
     constructor(props) {
         super(props)
 
-        this.client = new ApiClient(this.props.baseUrl);
+        this.client = new ApiClient(this.props.baseUrl, this.itemsUpdated.bind(this));
 
         this.state = {
             items: [],
@@ -26,16 +26,12 @@ export default class Home extends Component {
                 key={n.id} 
                 resource={n} 
                 client={this.client}
-                actionChanged={a => this.actionChanged(a, i)}
                 />)
 
         return (
         <div className='container'>
             <div className='navBar'>
                 <p>Sensornetze Demo</p>
-                <button
-                    onClick={this.reloadAllSensors.bind(this)}>Neu Laden
-                </button>
             </div>
             <div className='collection'>
                 {entries}
@@ -52,6 +48,12 @@ export default class Home extends Component {
         });
     }
 
+    itemsUpdated(items) {
+        this.setState({
+            items: items
+        });
+    }
+
     reloadAllSensors() {
         if (this.state.loading) return;
 
@@ -59,29 +61,8 @@ export default class Home extends Component {
         this.client.allResources()
             .catch(err => alert(err))
             .then(res => this.setState({
-                items: res || [],
                 loading: false
             }));
-
-        const ws = new WebSocket("ws://localhost:5238/");
-
-        ws.onmessage = e => {
-
-            this.setState({
-                items: JSON.parse(e.data) || [],
-                loading: false
-            });
-        }
-          
-        ws.onerror = e => {
-            // an error occurred
-            console.log(e.message);
-        };
-        
-        ws.onclose = e => {
-            // connection closed
-            console.log(e.code, e.reason);
-        };
     }
 
 }

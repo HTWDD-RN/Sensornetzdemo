@@ -112,7 +112,3 @@ exports.post = function (host, pathname, payload, contentFormat, success, fail) 
     req.write(payload);
     req.end();
 };
-
-exports.discover = function (host, success, fail) {
-    this.get(host, "/.well-known/core", success, fail);
-};

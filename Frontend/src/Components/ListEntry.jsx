@@ -11,7 +11,6 @@ export default class ListEntry extends Component {
                 id={this.props.resource.id}
                 action={a} 
                 client={this.props.client}
-                actionChanged={this.props.actionChanged}
                 />);
 
         return (

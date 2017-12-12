@@ -10,15 +10,35 @@ const Path = {
 
 export default class APIClient {
 
-    constructor(baseUrl) {
-        this.baseUrl = baseUrl;
+    constructor(baseUrl, onItems) {
+        this.baseUrl = 'http://' + baseUrl;
+        this.socketUrl = 'ws://' + baseUrl;
+        this.onItems = onItems;
+
+        const ws = new WebSocket(this.socketUrl);
+        ws.onmessage = e => {            
+            const items = JSON.parse(e.data) || [];
+            this.onItems(items);
+        }
+        ws.onerror = e => {
+            // an error occurred
+            console.log('Websocket error: ', e.message);
+        }
+        ws.onclose = e => {
+            // connection closed
+            console.log('Websocket close event: ', e.code, e.reason);
+        };
     }
 
     allResources() {
         const resolvedUrl = url.bind(this)(Path.allResources);
         return fetch(resolvedUrl)
                 .then(res => res.json())
-                .then(res => res.response);
+                .then(res => {
+                    const items = res.response;
+                    console.log(this);
+                    this.onItems(items);
+                });
     }
 
     oneResource(id) {

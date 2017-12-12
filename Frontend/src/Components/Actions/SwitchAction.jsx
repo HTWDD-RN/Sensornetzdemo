@@ -24,9 +24,7 @@ export default class SwitchAction extends Component {
 
         this.props.client.setStatus(this.props.id, this.props.action.id, newValue)
             .then(res => {
-                let action = this.props.action;
-                action.parameter.current = res.value;
-                this.props.actionChanged(action);
+                console.log('Updated value, got ', res, 'as response');
             })
     }
 }

@@ -18,5 +18,5 @@ exports.setState = function (ip, actionPath, payload, success, fail) {
  * @returns {Array} - raw array containing node resource information
  */
 exports.discover = function (ip, success, fail) {
-    coap.get(host, "/.well-known/core", success, fail);
+    coap.get(ip, "/.well-known/core", success, fail);
 };

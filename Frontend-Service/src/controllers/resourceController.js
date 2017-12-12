@@ -5,6 +5,8 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const uuid = require('uuid/v4');
 
+const RESOURCE_IPS = ["2001:db8::5855:1277:fb88:4f1e"];
+
 const dummyResource = {
     id: "led_a",
     name: "Node A (LED)",
@@ -190,7 +192,7 @@ exports.start = function (completion) {
     const isDebugMode = process.argv.indexOf("--d") !== -1;
     console.log(isDebugMode ? "Debug mode" : "Release mode");
     if (!isDebugMode) {
-        loadResources(["2001:db8::5855:1277:fb88:4f1e"], completion);
+        loadResources(RESOURCE_IPS, completion);
     } else {
         resources.push(dummyResource);
         for (let res of resources) {

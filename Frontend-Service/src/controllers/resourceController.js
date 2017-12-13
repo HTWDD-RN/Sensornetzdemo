@@ -33,6 +33,17 @@ const dummyResource = {
                 current: 0,
                 on: 1,
                 off: 0
+            },
+        },
+        {
+            id: "led_a_3",
+            name: "Dimmer",
+            type: "RANGE",
+            actionPath: '/DIMMER',
+            parameter: {
+                current: 0.5,
+                min: 0,
+                max: 1
             }
         }
     ]
@@ -89,29 +100,51 @@ exports.get_resource = function (req, res) {
     }
 };
 
+function isValidValue(action, value) {
+    if (action.type == "SWITCH") {
+        const val = parseInt(value);
+        console.log(val, action.parameter.on, action.parameter.off);
+        return val == action.parameter.on || val == action.parameter.off;
+    } else if (action.type == "RANGE") {
+        const val = parseFloat(value);
+        return val >= action.parameter.min && val <= action.parameter.max;
+    }
+    console.log("Unknown action", action.type);
+    return false;
+}
+
+function updateValue(action, value) {
+    if (action.type == "SWITCH") {
+        action.parameter.current = parseInt(value);
+    } else if (action.type == "RANGE") {
+        action.parameter.current = parseFloat(value);
+    }
+}
+
+
 exports.update_resource = function (req, res) {
     const resourceId = req.params.resourceId;
     const actionId = req.params.actionId;
-    const value = parseInt(req.body.value);
-    if (isNaN(value) || (value != 0 && value != 1)) {
-        var message = "Non-numeric value";
-        if (!req.body.value) {
-            message = "No value";
-        } else if (!isNaN(value)) {
-            message = "Provide valid value: [0,1]"
-        }
+    const value = req.body.value;
+    if (value == undefined) {
+        var message = "No value";
         res.status(400).send({ message: message });
         return;
     }
+
     const resource = findResourceById(resourceId);
     if (!resource) {
         sendResourceNotFoundResponse(res, resourceId);
     } else {
         for (let action of resource.actions) {
             if (action.id == actionId) {
+                if (!isValidValue(action, value)) {
+                    res.status(400).send({ message: 'Invalid value' });
+                    return;
+                }
                 console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://", resource.ip + action.actionPath);
                 resourceService.setState(resource.ip, action.actionPath, value.toString(), data => {
-                    action.parameter.current = parseInt(data);
+                    updateValue(action, data);
                     res.json({ value: action.parameter.current });
                     eventEmitter.emit('update', resources);
                 }, console.log.bind(this, "Could not update state."));

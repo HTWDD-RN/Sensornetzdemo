@@ -24,7 +24,7 @@ ACTION:
 }
 
 TYPE:
-"SWITCH"
+"SWITCH", "RANGE"
 
 TYPEPARAMETER:
 	"SWITCH":
@@ -32,6 +32,13 @@ TYPEPARAMETER:
 			"current": 1,
 			"on": 1,
 			"off": 0
+		}
+	
+	"RANGE":
+		{
+			"current": 0.5684923,
+			"min": 0,
+			"max": 1
 		}
 ```
 

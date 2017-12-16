@@ -115,7 +115,7 @@ function updateValue(action, value) {
     if (action.type == "SWITCH") {
         action.parameter.current = parseInt(value);
     } else if (action.type == "RANGE") {
-        action.parameter.current = parseFloat(value);
+        action.parameter.current = parseInt(value);
     }
 }
 

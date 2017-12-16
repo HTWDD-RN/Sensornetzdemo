@@ -41,9 +41,9 @@ const dummyResource = {
             type: "RANGE",
             actionPath: '/DIMMER',
             parameter: {
-                current: 0.5,
+                current: 127,
                 min: 0,
-                max: 1
+                max: 255
             }
         }
     ]
@@ -101,12 +101,10 @@ exports.get_resource = function (req, res) {
 };
 
 function isValidValue(action, value) {
+    const val = parseInt(value);    
     if (action.type == "SWITCH") {
-        const val = parseInt(value);
-        console.log(val, action.parameter.on, action.parameter.off);
         return val == action.parameter.on || val == action.parameter.off;
     } else if (action.type == "RANGE") {
-        const val = parseFloat(value);
         return val >= action.parameter.min && val <= action.parameter.max;
     }
     console.log("Unknown action", action.type);

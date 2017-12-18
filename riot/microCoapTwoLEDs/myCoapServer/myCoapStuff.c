@@ -23,6 +23,7 @@ void led0_blink(gpio_t led0_pin, int times)
 		toggle(led0_pin);
 	}
 }
+
 int init_pin(gpio_t pin, gpio_mode_t mode)
 {
 
@@ -64,6 +65,24 @@ int parse_payload(const uint8_t *input, size_t size )
         val = val * 10 + input[i] - '0';
 
     return( val );
+}
+
+void parse_payload_rgb(const char *input, int *rgb, size_t rgb_size)
+{
+	char *copy = strdup(input);
+	char delimiter[] = ";";
+	char *splitted_string;
+
+	splitted_string = strtok(copy, delimiter);
+	int i = 0;
+	while (splitted_string != NULL)
+	{
+	  rgb[i] = atoi(splitted_string);
+	  splitted_string = strtok (NULL, delimiter);
+	  i++;
+	  if(i >= rgb_size)
+	    splitted_string = NULL;
+	}		
 }
 
 int set(gpio_t pin)

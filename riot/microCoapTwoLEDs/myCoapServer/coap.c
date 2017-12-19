@@ -40,6 +40,12 @@ static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
                                 uint8_t id_hi, uint8_t id_lo); // pin PA14
 
 
+static int handle_post_dim_green(coap_rw_buffer_t *scratch,
+                                const coap_packet_t *inpkt,
+                                coap_packet_t *outpkt,
+                                uint8_t id_hi, uint8_t id_lo); // pin PA14
+
+
 static const coap_endpoint_path_t path_well_known_core =
         { 2, { ".well-known", "core" } };
 
@@ -55,6 +61,9 @@ static const coap_endpoint_path_t path_toggle_green =
 static const coap_endpoint_path_t path_led0_blink =
         { 2, { "htw", "led0" } };
 
+static const coap_endpoint_path_t path_dim_green =
+        { 2, { "RGB", "dim" } };
+
 const coap_endpoint_t endpoints[] =
 {
     { COAP_METHOD_GET,	handle_get_well_known_core,
@@ -67,9 +76,12 @@ const coap_endpoint_t endpoints[] =
   		  &path_toggle_green,	   "ct=0"  },
     { COAP_METHOD_POST,	handle_get_seconds_led0_blink,
 		    &path_led0_blink,	   "ct=0"  },
+    { COAP_METHOD_POST,	handle_post_dim_green,
+		    &path_dim_green,	   "ct=0"  },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };
+
 static int handle_get_toggle_red(coap_rw_buffer_t *scratch,
 		const coap_packet_t *inpkt, coap_packet_t *outpkt,
 		uint8_t id_hi, uint8_t id_lo)
@@ -117,6 +129,36 @@ static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
 	                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
 	                              COAP_CONTENTTYPE_TEXT_PLAIN);
 }
+
+
+
+static int handle_post_dim_green(coap_rw_buffer_t *scratch,
+		const coap_packet_t *inpkt, coap_packet_t *outpkt,
+		uint8_t id_hi, uint8_t id_lo)
+{
+	int rgb[3];
+	//printf("PACKET %s\n", inpkt->payload.p);
+
+  	parse_payload_rgb((const char*)inpkt->payload.p,  rgb, 3);
+        
+	for(int i=0; i<3; i++)
+		printf("RGB %i\n", rgb[i]);
+	
+	/*
+		implement dim functionality ...
+		// dim_rgb();
+	*/
+
+	char str[] = "a";
+  	memcpy(response, str, 1);
+
+	return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
+	                          id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+	                          COAP_CONTENTTYPE_TEXT_PLAIN);
+}
+
+
+
 
 
 static int handle_get_seconds_led0_blink(coap_rw_buffer_t *scratch,

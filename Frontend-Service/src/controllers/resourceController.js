@@ -142,8 +142,27 @@ function updateValue(action, value) {
     } else if (action.type == "RANGE") {
         action.parameter.current = parseInt(value);
     } else if (action.type == "COLOR_RANGE") {
-        action.parameter.current = Array.isArray(value) ? value : JSON.parse(value);
+        try { //debug mode - we've got array
+            action.parameter.current = Array.isArray(value) ? value : JSON.parse(value);
+        } catch (e) { //handles api response
+            const vals = value.split(";");
+            const res = [];
+            for (let i of vals) {
+                res.push(parseInt(i));
+            }
+            action.paramter.current = res;
+        }
     }
+}
+
+function getPayload(actionType, value) {
+    if (action.type == "SWITCH" || action.type == "RANGE") {
+        return value.toString();
+    } else if (action.type == "COLOR_RANGE") {
+        const arr = Array.isArray(value) ? value : JSON.parse(value);
+        return arr.join(";");
+    }
+    return "";
 }
 
 
@@ -168,7 +187,7 @@ exports.update_resource = function (req, res) {
                     return;
                 }
                 console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://", resource.ip + action.actionPath);
-                resourceService.setState(resource.ip, action.actionPath, value.toString(), data => {
+                resourceService.setState(resource.ip, action.actionPath, getPayload(action.type, value), data => {
                     updateValue(action, data);
                     res.json({ value: action.parameter.current });
                     eventEmitter.emit('update', resources);

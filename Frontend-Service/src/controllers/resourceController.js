@@ -45,6 +45,17 @@ const dummyResource = {
                 min: 0,
                 max: 255
             }
+        },
+        {
+            id: "led_a_4",
+            name: "RGB",
+            type: "COLOR_RANGE",
+            actionPath: '/RGB',
+            parameter: {
+                min: [0, 0, 0],
+                max: [255, 255, 255],
+                current: [127, 127, 127]
+            }
         }
     ]
 };
@@ -101,12 +112,26 @@ exports.get_resource = function (req, res) {
 };
 
 function isValidValue(action, value) {
-    const val = parseInt(value);    
     if (action.type == "SWITCH") {
+        const val = parseInt(value);
         return val == action.parameter.on || val == action.parameter.off;
     } else if (action.type == "RANGE") {
+        const val = parseInt(value);
         return val >= action.parameter.min && val <= action.parameter.max;
+    } else if (action.type == "COLOR_RANGE") {
+        const val = Array.isArray(value) ? value : JSON.parse(value);
+        if (val.length !== 3) {
+            return false;
+        }
+        for (var i = 0; i < 3; i++) {
+            const intVal = parseInt(val[i]);
+            if (intVal == undefined || intVal < action.parameter.min[i] || intVal > action.parameter.max[i]) {
+                return false;
+            }
+        }
+        return true;
     }
+
     console.log("Unknown action", action.type);
     return false;
 }
@@ -116,6 +141,8 @@ function updateValue(action, value) {
         action.parameter.current = parseInt(value);
     } else if (action.type == "RANGE") {
         action.parameter.current = parseInt(value);
+    } else if (action.type == "COLOR_RANGE") {
+        action.parameter.current = Array.isArray(value) ? value : JSON.parse(value);
     }
 }
 

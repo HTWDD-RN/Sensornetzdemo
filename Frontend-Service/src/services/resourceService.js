@@ -8,7 +8,12 @@ exports.setState = function (ip, actionPath, payload, success, fail) {
             success(data);
         }
     }
-    coap.post(ip, actionPath, payload, undefined, successWrapper, fail);
+    const isDebugMode = process.argv.indexOf("--d") !== -1;
+    if (!isDebugMode) {
+        coap.post(ip, actionPath, payload, undefined, successWrapper, fail);
+    } else {
+        successWrapper("text/plain", payload);
+    }
     return 0;
 };
 

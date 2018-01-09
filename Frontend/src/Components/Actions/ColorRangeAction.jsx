@@ -24,21 +24,6 @@ export default class ColorRangeAction extends Component {
     }
 
     handleChange(color, event) {
-        // color = {
-        //   hex: '#333',
-        //   rgb: {
-        //     r: 51,
-        //     g: 51,
-        //     b: 51,
-        //     a: 1,
-        //   },
-        //   hsl: {
-        //     h: 0,
-        //     s: 0,
-        //     l: .20,
-        //     a: 1,
-        //   },
-        // }
         const newColor = [color['rgb']['r'], color['rgb']['g'], color['rgb']['b']];
         this.props.client.setStatus(this.props.id, this.props.action.id, JSON.stringify(newColor))
             .then(res => {

@@ -142,23 +142,19 @@ function updateValue(action, value) {
     } else if (action.type == "RANGE") {
         action.parameter.current = parseInt(value);
     } else if (action.type == "COLOR_RANGE") {
-        try { //debug mode - we've got array
-            action.parameter.current = Array.isArray(value) ? value : JSON.parse(value);
-        } catch (e) { //handles api response
-            const vals = value.split(";");
-            const res = [];
-            for (let i of vals) {
-                res.push(parseInt(i));
-            }
-            action.paramter.current = res;
+        const vals = value.split(";");
+        const arr = [];
+        for (let i of vals) {
+            arr.push(parseInt(i));
         }
+        action.parameter.current = arr;
     }
 }
 
 function getPayload(actionType, value) {
-    if (action.type == "SWITCH" || action.type == "RANGE") {
+    if (actionType == "SWITCH" || actionType == "RANGE") {
         return value.toString();
-    } else if (action.type == "COLOR_RANGE") {
+    } else if (actionType == "COLOR_RANGE") {
         const arr = Array.isArray(value) ? value : JSON.parse(value);
         return arr.join(";");
     }

@@ -45,6 +45,17 @@ const dummyResource = {
                 min: 0,
                 max: 255
             }
+        },
+        {
+            id: "led_a_4",
+            name: "RGB",
+            type: "COLOR_RANGE",
+            actionPath: '/RGB',
+            parameter: {
+                min: [0, 0, 0],
+                max: [255, 255, 255],
+                current: [127, 127, 127]
+            }
         }
     ]
 };

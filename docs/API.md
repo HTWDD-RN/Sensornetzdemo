@@ -24,7 +24,7 @@ ACTION:
 }
 
 TYPE:
-"SWITCH", "RANGE"
+"SWITCH", "RANGE", "COLOR_RANGE"
 
 TYPEPARAMETER:
 	"SWITCH":
@@ -39,6 +39,13 @@ TYPEPARAMETER:
 			"current": 0.5684923,
 			"min": 0,
 			"max": 1
+		}
+
+	"COLOR_RANGE":
+		{
+			"current": [127,87,59],
+			"min": [0,0,0],
+			"max": [255,255,255]
 		}
 ```
 

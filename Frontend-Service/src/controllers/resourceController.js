@@ -112,19 +112,20 @@ exports.get_resource = function (req, res) {
 };
 
 function isValidValue(action, value) {
-    const val = parseInt(value);
     if (action.type == "SWITCH") {
+        const val = parseInt(value);
         return val == action.parameter.on || val == action.parameter.off;
     } else if (action.type == "RANGE") {
+        const val = parseInt(value);
         return val >= action.parameter.min && val <= action.parameter.max;
     } else if (action.type == "COLOR_RANGE") {
         const val = Array.isArray(value) ? value : JSON.parse(value);
-        if (val.length !== action.parameter.count) {
+        if (val.length !== 3) {
             return false;
         }
         for (var i = 0; i < 3; i++) {
             const intVal = parseInt(val[i]);
-            if (!intVal || intVal < action.parameter.min[i] || intVal > action.parameter.max[i]) {
+            if (intVal == undefined || intVal < action.parameter.min[i] || intVal > action.parameter.max[i]) {
                 return false;
             }
         }
@@ -140,6 +141,8 @@ function updateValue(action, value) {
         action.parameter.current = parseInt(value);
     } else if (action.type == "RANGE") {
         action.parameter.current = parseInt(value);
+    } else if (action.type == "COLOR_RANGE") {
+        action.parameter.current = Array.isArray(value) ? value : JSON.parse(value);
     }
 }
 

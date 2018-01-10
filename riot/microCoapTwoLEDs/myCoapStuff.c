@@ -2,10 +2,7 @@
  * myCoapStuff.c
  */
 
-
 #include "include/myCoapStuff.h"
-
-
 
 void led0_blink(gpio_t led0_pin, int times)
 {
@@ -80,9 +77,42 @@ void parse_payload_rgb(const char *input, int *rgb, size_t rgb_size)
 	  rgb[i] = atoi(splitted_string);
 	  splitted_string = strtok (NULL, delimiter);
 	  i++;
-	  if(i >= rgb_size)
-	    splitted_string = NULL;
-	}		
+	  if(i >= rgb_size) {
+		  splitted_string = NULL;
+		  return;
+	  }
+	}
+}
+
+/// input:
+///        IP#somePayload
+///        IP2#payload2
+///
+/// returns: length of found input
+///
+/// *NOTE*: Could return NULL if no payload for this node was included!
+unsigned long extract_payload(char *ip, const char *input, char *output) {
+    char *copy = strdup(input);
+    char *line;
+    char *lineToken;
+    line = strtok_r(copy, "\n", &lineToken);
+    while (line != NULL)
+    {
+        char *hashtagToken;
+        char *lineCopy = strdup(line);
+        char *content;
+        
+        content = strtok_r(lineCopy, "#", &hashtagToken);
+        // check if equal to ip
+        if (strcmp(content, ip) == 0) {
+            content = strtok_r(NULL, "\n", &hashtagToken);
+            strcpy(output, content);
+            return strlen(content);
+        }
+        
+        line = strtok_r(NULL, "\n", &lineToken);
+    }
+    return 0;
 }
 
 int set(gpio_t pin)

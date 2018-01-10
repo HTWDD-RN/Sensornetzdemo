@@ -110,8 +110,12 @@ static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
 		uint8_t id_hi, uint8_t id_lo)
 {
 
+        const char *input = (const char*)inpkt->payload.p;
+        char buffer[256];
+        // TODO: Get real IP!
+        int len = (int)extract_payload("::1", input, buffer);
 
-  	    int onOff = parse_payload( inpkt->payload.p, inpkt->payload.len );
+  	    int onOff = parse_payload((const uint8_t*)buffer, len);
         char str[1];
         if(onOff == 0) {
           clear(PIN_LED_GREEN);
@@ -136,10 +140,17 @@ static int handle_post_dim_green(coap_rw_buffer_t *scratch,
 		const coap_packet_t *inpkt, coap_packet_t *outpkt,
 		uint8_t id_hi, uint8_t id_lo)
 {
-	int rgb[3];
-	//printf("PACKET %s\n", inpkt->payload.p);
+    int rgb[3] = {255, 0, 0};
+    const char *input = (const char*)inpkt->payload.p;
 
-  	parse_payload_rgb((const char*)inpkt->payload.p,  rgb, 3);
+    char buffer[1024];
+    // TODO: Get real IP!
+    if (extract_payload("::1", input, buffer)) {
+        printf("Parsed my payload: %s", buffer);
+        parse_payload_rgb(buffer, rgb, 3);
+    } else {
+        parse_payload_rgb(input, rgb, 3);
+    }
         
 	for(int i=0; i<3; i++)
 		printf("RGB %i\n", rgb[i]);

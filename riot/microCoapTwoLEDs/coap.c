@@ -66,25 +66,25 @@ static const coap_endpoint_path_t path_dim_green =
 
 const coap_endpoint_t endpoints[] =
 {
-    { COAP_METHOD_GET,	handle_get_well_known_core,
+    { COAP_METHOD_GET,  handle_get_well_known_core,
         &path_well_known_core, "ct=40" },
-    { COAP_METHOD_GET,	handle_get_riot_board,
-        &path_riot_board,	   "ct=0"  },
-    { COAP_METHOD_POST,	handle_get_toggle_red,
-		    &path_toggle_red,	   "ct=0"  },
-    { COAP_METHOD_POST,	handle_get_toggle_green,
-  		  &path_toggle_green,	   "ct=0"  },
-    { COAP_METHOD_POST,	handle_get_seconds_led0_blink,
-		    &path_led0_blink,	   "ct=0"  },
-    { COAP_METHOD_POST,	handle_post_dim_green,
-		    &path_dim_green,	   "ct=0"  },
+    { COAP_METHOD_GET,  handle_get_riot_board,
+        &path_riot_board,    "ct=0"  },
+    { COAP_METHOD_POST, handle_get_toggle_red,
+        &path_toggle_red,    "ct=0"  },
+    { COAP_METHOD_POST, handle_get_toggle_green,
+        &path_toggle_green,    "ct=0"  },
+    { COAP_METHOD_POST, handle_get_seconds_led0_blink,
+        &path_led0_blink,    "ct=0"  },
+    { COAP_METHOD_POST, handle_post_dim_green,
+        &path_dim_green,     "ct=0"  },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };
 
 static int handle_get_toggle_red(coap_rw_buffer_t *scratch,
-		const coap_packet_t *inpkt, coap_packet_t *outpkt,
-		uint8_t id_hi, uint8_t id_lo)
+    const coap_packet_t *inpkt, coap_packet_t *outpkt,
+    uint8_t id_hi, uint8_t id_lo)
 {
 
 
@@ -101,21 +101,24 @@ static int handle_get_toggle_red(coap_rw_buffer_t *scratch,
   sprintf(str, "%d", onOff);
   int len = sizeof(str);
   memcpy(response, str, len);
-	    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
-	                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
-	                              COAP_CONTENTTYPE_TEXT_PLAIN);
+      return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
+                                id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                                COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
-		const coap_packet_t *inpkt, coap_packet_t *outpkt,
-		uint8_t id_hi, uint8_t id_lo)
+    const coap_packet_t *inpkt, coap_packet_t *outpkt,
+    uint8_t id_hi, uint8_t id_lo)
 {
 
         const char *input = (const char*)inpkt->payload.p;
         char buffer[256];
         // TODO: Get real IP!
-        int len = (int)extract_payload("::1", input, buffer);
+        int payloadLen = (int)extract_payload("::1", input, buffer);
+        if (payloadLen <= 0)
+            return -1;
 
-  	    int onOff = parse_payload((const uint8_t*)buffer, len);
+        int onOff = parse_payload((const uint8_t*)buffer, payloadLen);
+
         char str[1];
         if(onOff == 0) {
           clear(PIN_LED_GREEN);
@@ -125,20 +128,20 @@ static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
 
         }
 
-  	    sprintf(str, "%d", onOff);
+        sprintf(str, "%d", onOff);
         int len = sizeof(str);
-  	    memcpy(response, str, len);
+        memcpy(response, str, len);
       //const char *riot_name = RIOT_BOARD;
-	    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
-	                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
-	                              COAP_CONTENTTYPE_TEXT_PLAIN);
+      return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
+                                id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                                COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
 
 
 static int handle_post_dim_green(coap_rw_buffer_t *scratch,
-		const coap_packet_t *inpkt, coap_packet_t *outpkt,
-		uint8_t id_hi, uint8_t id_lo)
+    const coap_packet_t *inpkt, coap_packet_t *outpkt,
+    uint8_t id_hi, uint8_t id_lo)
 {
     int rgb[3] = {255, 0, 0};
     const char *input = (const char*)inpkt->payload.p;
@@ -149,23 +152,23 @@ static int handle_post_dim_green(coap_rw_buffer_t *scratch,
         printf("Parsed my payload: %s", buffer);
         parse_payload_rgb(buffer, rgb, 3);
     } else {
-        parse_payload_rgb(input, rgb, 3);
+        return -1;
     }
         
-	for(int i=0; i<3; i++)
-		printf("RGB %i\n", rgb[i]);
-	
-	/*
-		implement dim functionality ...
-		// dim_rgb();
-	*/
+  for(int i=0; i<3; i++)
+    printf("RGB %i\n", rgb[i]);
+  
+  /*
+    implement dim functionality ...
+    // dim_rgb();
+  */
 
-	char str[] = "a";
-  	memcpy(response, str, 1);
+  char str[] = "a";
+    memcpy(response, str, 1);
 
-	return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
-	                          id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
-	                          COAP_CONTENTTYPE_TEXT_PLAIN);
+  return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
+                            id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                            COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
 
@@ -173,17 +176,17 @@ static int handle_post_dim_green(coap_rw_buffer_t *scratch,
 
 
 static int handle_get_seconds_led0_blink(coap_rw_buffer_t *scratch,
-		const coap_packet_t *inpkt, coap_packet_t *outpkt,
-		uint8_t id_hi, uint8_t id_lo)
+    const coap_packet_t *inpkt, coap_packet_t *outpkt,
+    uint8_t id_hi, uint8_t id_lo)
 {
-	    int times = parse_payload( inpkt->payload.p, inpkt->payload.len );
+      int times = parse_payload( inpkt->payload.p, inpkt->payload.len );
       //size_t lenpayload = inpkt->payload.len;
       //int times = atoi(p);
-	    char str[80];
-	    sprintf(str, "Blinked %d times", times);
+      char str[80];
+      sprintf(str, "Blinked %d times", times);
       puts(str);
       int len = sizeof(str);
-	    memcpy(response, str, len);
+      memcpy(response, str, len);
 
       led0_blink(LED0_PIN,times);
 	    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,

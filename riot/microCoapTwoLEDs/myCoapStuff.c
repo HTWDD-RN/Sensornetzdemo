@@ -25,7 +25,7 @@ int init_pin(gpio_t pin, gpio_mode_t mode)
 {
 
     if (gpio_init(pin, mode) < 0) {
-        printf("Error to initialize GPIO_PIN(%lu)\n", pin);
+        printf("Error to initialize GPIO_PIN(%u)\n", pin);
         return 1;
     }
 
@@ -46,10 +46,10 @@ int read(gpio_t pin)
 {
 
     if (gpio_read(pin)) {
-        printf("GPIO_PIN(%lu) is HIGH\n", pin);
+        printf("GPIO_PIN(%u) is HIGH\n", pin);
     }
     else {
-        printf("GPIO_PIN(%lu) is LOW\n", pin);
+        printf("GPIO_PIN(%u) is LOW\n", pin);
     }
 
     return 0;
@@ -57,7 +57,7 @@ int read(gpio_t pin)
 
 int parse_payload(const uint8_t *input, size_t size )
 {
-    int i=0, val=0;
+    unsigned int i=0, val=0;
     for ( ; i < size && isdigit( input[i] ); i++ )
         val = val * 10 + input[i] - '0';
 
@@ -71,7 +71,7 @@ void parse_payload_rgb(const char *input, int *rgb, size_t rgb_size)
 	char *splitted_string;
 
 	splitted_string = strtok(copy, delimiter);
-	int i = 0;
+	unsigned int i = 0;
 	while (splitted_string != NULL)
 	{
 	  rgb[i] = atoi(splitted_string);

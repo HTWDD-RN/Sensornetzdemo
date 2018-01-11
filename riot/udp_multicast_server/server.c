@@ -11,10 +11,9 @@
 #define SERVER_MSG_QUEUE_SIZE   (8)
 #define SERVER_BUFFER_SIZE      (64)
 
-static const int PORT = 5683;
+static const int UDP_PORT = 5683;
 static char *PORTSTRING = "5683";
 
-static bool server_running = false;
 static sock_udp_t sock;
 static char server_buffer[SERVER_BUFFER_SIZE];
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
@@ -29,7 +28,7 @@ int udp_send(char *addr, char *payload)
         puts("Error: unable to parse destination address");
         return 1;
     }
-    remote.port = PORT;
+    remote.port = UDP_PORT;
     if((res = sock_udp_send(NULL, payload, strlen(payload), &remote)) < 0) {
         puts("could not send");
     }
@@ -48,7 +47,6 @@ void *_udp_server(void *args)
         return NULL;
     }
 
-    server_running = true;
     printf("Success: started UDP server on port %u\n", server.port);
 
     while (1) {
@@ -65,6 +63,8 @@ void *_udp_server(void *args)
         else {
             server_buffer[res] = '\0';
             printf("Recvd: %s\n", server_buffer);
+
+            // send packages as multicast
             udp_send("ff02::1", server_buffer);
         }
     }

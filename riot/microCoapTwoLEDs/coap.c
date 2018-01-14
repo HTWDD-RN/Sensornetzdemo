@@ -124,8 +124,7 @@ static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
 
         const char *input = (const char*)inpkt->payload.p;
         char buffer[256];
-        // TODO: Get real IP!
-        int payloadLen = (int)extract_payload("::1", input, buffer);
+        int payloadLen = (int)extract_payload(input, buffer);
         if (payloadLen <= 0)
             return -1;
 
@@ -158,8 +157,7 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 	const char *input = (const char*)inpkt->payload.p;
 
 	char buffer[1024];
-	// TODO: Get real IP!
-	if (extract_payload("::1", input, buffer)) {
+	if (extract_payload(input, buffer)) {
 		printf("Parsed my payload: %s", buffer);
         rgb = parse_payload_rgb(buffer);
 	} else {

@@ -24,7 +24,7 @@ int clear(gpio_t pin);
 int toggle(gpio_t pin);
 int parse_payload(const uint8_t *input, size_t size );
 int parse_payload_rgb(const char *input);
-unsigned long extract_payload(char *ip, const char *input, char *output);
+unsigned long extract_payload(const char *input, char *output);
 
 
 #endif /* EXAMPLES_MYCOAPSERVER_MYCOAPSTUFF_H_ */

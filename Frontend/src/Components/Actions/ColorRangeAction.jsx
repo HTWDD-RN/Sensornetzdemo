@@ -3,7 +3,7 @@ import { ChromePicker } from 'react-color';
 import Switch from 'react-ios-switch';
 import './ColorRangeAction.css';
 
-const colorArr = [[0, 0, 0], [127, 50, 0], [0, 127, 10], [0, 5, 127], [255, 255, 255]];
+const colorArr = [0x000000, 0x7f3200, 0x007f0a, 0x00057f, 0xffffff];
 
 export default class ColorRangeAction extends Component {
 
@@ -12,21 +12,23 @@ export default class ColorRangeAction extends Component {
         this.state = {
             isDemoRunning: false
         };
+        this.lastSentValue = -1;
     }
 
     render() {
         const action = this.props.action;
-        const current = action.parameter.current; // [r, g, b]
+        const current = action.parameter.current; // 0xff0220
         const color = {
-            r: current[0],
-            g: current[1],
-            b: current[2]
+            r: (current & 0xff0000) >> 16,
+            g: (current & 0x00ff00) >> 8,
+            b: current & 0x0000ff
         }
 
         return (
             <div>
                 <ChromePicker
                     color={color}
+                    disableAlpha={true}
                     onChange={this.handleChange.bind(this)}
                 />
                 <p>Demo starten:
@@ -41,20 +43,19 @@ export default class ColorRangeAction extends Component {
     }
 
     handleChange(color, event) {
-        const newColor = [color['rgb']['r'], color['rgb']['g'], color['rgb']['b']];
-        this.props.client.setStatus(this.props.id, this.props.action.id, JSON.stringify(newColor))
-            .then(res => {
-                console.log('Updated value, got ', res, 'as response');
-            });
+        // remove # sign and parse hex number to integer
+        const newColor = parseInt(color.hex.substring(1), 16);
+
+        if (this.lastSentValue === newColor) return;
+        this.lastSentValue = newColor;
+
+        this.props.client.setStatus(this.props.id, this.props.action.id, newColor);
     }
 
     runDemo(isChecked) {
         console.log("starting demo");
-        this.setState(
-            {
-                isDemoRunning: isChecked
-            }
-        );
+        this.setState({ isDemoRunning: isChecked });
+
         if (this.state.isDemoRunning) {
             const onComplete = function () {
                 this.sendColor(colorArr, onComplete, onInterrupted);

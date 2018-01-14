@@ -35,9 +35,7 @@ export default class APIClient {
         return fetch(resolvedUrl)
                 .then(res => res.json())
                 .then(res => {
-                    const items = res.response;
-                    console.log(this);
-                    this.onItems(items);
+                    this.onItems(res.response);
                 });
     }
 

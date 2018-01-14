@@ -43,9 +43,9 @@ TYPEPARAMETER:
 
 	"COLOR_RANGE":
 		{
-			"current": [127,87,59],
-			"min": [0,0,0],
-			"max": [255,255,255]
+			"current": 2309306, // 0x233cba
+			"min": 0, // 0x000000
+			"max": 16777215 // 0xffffff
 		}
 ```
 

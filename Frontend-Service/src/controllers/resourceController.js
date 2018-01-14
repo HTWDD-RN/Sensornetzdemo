@@ -52,9 +52,9 @@ const dummyResource = {
             type: "COLOR_RANGE",
             actionPath: '/RGB',
             parameter: {
-                min: [0, 0, 0],
-                max: [255, 255, 255],
-                current: [127, 127, 127]
+                min: 0x000000,
+                max: 0xffffff,
+                current: 0x7f7f7f
             }
         }
     ]
@@ -119,17 +119,8 @@ function isValidValue(action, value) {
         const val = parseInt(value);
         return val >= action.parameter.min && val <= action.parameter.max;
     } else if (action.type == "COLOR_RANGE") {
-        const val = Array.isArray(value) ? value : JSON.parse(value);
-        if (val.length !== 3) {
-            return false;
-        }
-        for (var i = 0; i < 3; i++) {
-            const intVal = parseInt(val[i]);
-            if (intVal == undefined || intVal < action.parameter.min[i] || intVal > action.parameter.max[i]) {
-                return false;
-            }
-        }
-        return true;
+        const val = parseInt(value);
+        return val >= action.parameter.min && val <= action.parameter.max;
     }
 
     console.log("Unknown action", action.type);
@@ -142,21 +133,13 @@ function updateValue(action, value) {
     } else if (action.type == "RANGE") {
         action.parameter.current = parseInt(value);
     } else if (action.type == "COLOR_RANGE") {
-        const vals = value.split(";");
-        const arr = [];
-        for (let i of vals) {
-            arr.push(parseInt(i));
-        }
-        action.parameter.current = arr;
+        action.parameter.current = parseInt(value);
     }
 }
 
 function getPayload(actionType, value) {
-    if (actionType == "SWITCH" || actionType == "RANGE") {
+    if (actionType == "SWITCH" || actionType == "RANGE" || actionType == "COLOR_RANGE") {
         return value.toString();
-    } else if (actionType == "COLOR_RANGE") {
-        const arr = Array.isArray(value) ? value : JSON.parse(value);
-        return arr.join(";");
     }
     return "";
 }

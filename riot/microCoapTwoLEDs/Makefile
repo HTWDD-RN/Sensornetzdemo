@@ -37,7 +37,7 @@ USEMODULE += shell_commands
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-#CFLAGS += -DDEVELHELP
+CFLAGS += -DDEVELHELP -O3
 
 # Use different settings when compiling for one of the following (low-memory)
 # boards
@@ -71,3 +71,5 @@ else
     CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
   endif
 endif
+
+CFLAGS += -Wno-error

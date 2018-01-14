@@ -66,7 +66,8 @@ int parse_payload(const uint8_t *input, size_t size )
 
 void parse_payload_rgb(const char *input, int *rgb, size_t rgb_size)
 {
-	char *copy = strdup(input);
+	// RGB in int, splitted by delimiter ;
+	/*char *copy = strdup(input);
 	char delimiter[] = ";";
 	char *splitted_string;
 
@@ -81,7 +82,10 @@ void parse_payload_rgb(const char *input, int *rgb, size_t rgb_size)
 		  splitted_string = NULL;
 		  return;
 	  }
-	}
+	}*/
+
+	for(int i=0;i<rgb_size;i++)
+		rgb[i] = (int)strtol(strndup(input + 2 * i, 2),NULL,16);
 }
 
 /// input:

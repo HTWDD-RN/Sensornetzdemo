@@ -10,5 +10,6 @@
 //#define PIN_LED_RED     (2)
 #define PIN_LED_GREEN  GPIO_PIN(0, 14)
 //#define PIN_LED_GREEN   (14)
+#define PIN_LED_STRIP  GPIO_PIN(0, 14)
 
 #endif //EXAMPLES_MYCOAPSERVER_H_

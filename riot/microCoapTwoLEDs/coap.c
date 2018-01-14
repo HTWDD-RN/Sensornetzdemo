@@ -7,11 +7,22 @@
  */
 
 #include <coap.h>
-#include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "include/myCoapStuff.h"
 #include "include/microCoAPServer.h"
+
+#include "include/light_ws2812_cortex.h"
+
+#include "xtimer.h"
+
 #define MAX_RESPONSE_LEN 500
+
+#define MAXPIX 6
+struct cRGB led[MAXPIX];
+
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
@@ -40,7 +51,7 @@ static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
                                 uint8_t id_hi, uint8_t id_lo); // pin PA14
 
 
-static int handle_post_dim_green(coap_rw_buffer_t *scratch,
+static int handle_post_led_strip(coap_rw_buffer_t *scratch,
                                 const coap_packet_t *inpkt,
                                 coap_packet_t *outpkt,
                                 uint8_t id_hi, uint8_t id_lo); // pin PA14
@@ -61,30 +72,30 @@ static const coap_endpoint_path_t path_toggle_green =
 static const coap_endpoint_path_t path_led0_blink =
         { 2, { "htw", "led0" } };
 
-static const coap_endpoint_path_t path_dim_green =
-        { 2, { "RGB", "dim" } };
+static const coap_endpoint_path_t path_led_strip =
+        { 2, { "LED", "strip" } };
 
 const coap_endpoint_t endpoints[] =
 {
     { COAP_METHOD_GET,  handle_get_well_known_core,
         &path_well_known_core, "ct=40" },
-    { COAP_METHOD_GET,  handle_get_riot_board,
-        &path_riot_board,    "ct=0"  },
-    { COAP_METHOD_POST, handle_get_toggle_red,
-        &path_toggle_red,    "ct=0"  },
-    { COAP_METHOD_POST, handle_get_toggle_green,
-        &path_toggle_green,    "ct=0"  },
-    { COAP_METHOD_POST, handle_get_seconds_led0_blink,
-        &path_led0_blink,    "ct=0"  },
-    { COAP_METHOD_POST, handle_post_dim_green,
-        &path_dim_green,     "ct=0"  },
+    { COAP_METHOD_GET,	handle_get_riot_board,
+        &path_riot_board,	   "ct=0"  },
+    { COAP_METHOD_POST,	handle_get_toggle_red,
+		    &path_toggle_red,	   "ct=0"  },
+    { COAP_METHOD_POST,	handle_get_toggle_green,
+  		  &path_toggle_green,	   "ct=0"  },
+    { COAP_METHOD_POST,	handle_get_seconds_led0_blink,
+		    &path_led0_blink,	   "ct=0"  },
+    { COAP_METHOD_POST,	handle_post_led_strip,
+		    &path_led_strip,	   "ct=0"  },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };
 
 static int handle_get_toggle_red(coap_rw_buffer_t *scratch,
-    const coap_packet_t *inpkt, coap_packet_t *outpkt,
-    uint8_t id_hi, uint8_t id_lo)
+		const coap_packet_t *inpkt, coap_packet_t *outpkt,
+		uint8_t id_hi, uint8_t id_lo)
 {
 
 
@@ -105,6 +116,7 @@ static int handle_get_toggle_red(coap_rw_buffer_t *scratch,
                                 id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
                                 COAP_CONTENTTYPE_TEXT_PLAIN);
 }
+
 static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
     const coap_packet_t *inpkt, coap_packet_t *outpkt,
     uint8_t id_hi, uint8_t id_lo)
@@ -137,43 +149,41 @@ static int handle_get_toggle_green(coap_rw_buffer_t *scratch,
                                 COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
-
-
-static int handle_post_dim_green(coap_rw_buffer_t *scratch,
-    const coap_packet_t *inpkt, coap_packet_t *outpkt,
-    uint8_t id_hi, uint8_t id_lo)
+static int handle_post_led_strip(coap_rw_buffer_t *scratch,
+		const coap_packet_t *inpkt, coap_packet_t *outpkt,
+		uint8_t id_hi, uint8_t id_lo)
 {
-    int rgb[3] = {255, 0, 0};
-    const char *input = (const char*)inpkt->payload.p;
+	int rgb[3] = {255, 0, 0};
+	const char *input = (const char*)inpkt->payload.p;
 
-    char buffer[1024];
-    // TODO: Get real IP!
-    if (extract_payload("::1", input, buffer)) {
-        printf("Parsed my payload: %s", buffer);
-        parse_payload_rgb(buffer, rgb, 3);
-    } else {
-        return -1;
-    }
+	//parse_payload_rgb((const char*)inpkt->payload.p,  rgb, 3);
+
+	char buffer[1024];
+	// TODO: Get real IP!
+	if (extract_payload("::1", input, buffer)) {
+		printf("Parsed my payload: %s", buffer);
+		parse_payload_rgb(buffer, rgb, 3);
+	} else {
+		return -1;
+	}
         
-  for(int i=0; i<3; i++)
-    printf("RGB %i\n", rgb[i]);
-  
-  /*
-    implement dim functionality ...
-    // dim_rgb();
-  */
+	////////////
+	// LED strip
+	for(int i=0;i<MAXPIX;i++)
+	{
+		led[i].r = rgb[0];
+		led[i].g = rgb[1];
+		led[i].b = rgb[2];
+	}
 
-  char str[] = "a";
-    memcpy(response, str, 1);
+	ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
 
-  return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
-                            id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
-                            COAP_CONTENTTYPE_TEXT_PLAIN);
+	memcpy(response, "TODO", 4);
+
+	return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
+	                          id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+	                          COAP_CONTENTTYPE_TEXT_PLAIN);
 }
-
-
-
-
 
 static int handle_get_seconds_led0_blink(coap_rw_buffer_t *scratch,
     const coap_packet_t *inpkt, coap_packet_t *outpkt,

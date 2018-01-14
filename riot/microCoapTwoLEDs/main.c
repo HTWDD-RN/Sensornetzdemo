@@ -44,8 +44,10 @@ int main(void)
     led0_blink(LED0_PIN, 3);
     init_out(PIN_LED_GREEN);
     init_out(PIN_LED_RED);
+    init_out(PIN_LED_STRIP);
     clear(PIN_LED_RED);
     clear(PIN_LED_GREEN);
+    clear(PIN_LED_STRIP);
     puts("SETUP successfull");
     puts("Waiting for address autoconfiguration...");
     xtimer_sleep(3);

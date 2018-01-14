@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="HandheldFriendly" content="true" />
     <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-title" content="FS 16/17" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <link rel="apple-touch-icon" href="FS.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="FS-76-76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="FS-120-120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="FS-152-152.png">
     <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
@@ -21,6 +28,20 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+              // iOS web app full screen hacks.
+              if(window.navigator.standalone == true) {
+                      // make all link remain in web app mode.
+                      $('a').click(function() {
+                              window.location = $(this).attr('href');
+                  return false;
+                      });
+              }
+      });
+      </script>
+
   </head>
   <body ontouchstart=''>
     <noscript>

@@ -153,30 +153,29 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 		const coap_packet_t *inpkt, coap_packet_t *outpkt,
 		uint8_t id_hi, uint8_t id_lo)
 {
-	int rgb[3] = {255, 0, 0};
+    // red by default to indicate parsing error visually
+	int rgb = 0xff0000;
 	const char *input = (const char*)inpkt->payload.p;
-
-	//parse_payload_rgb((const char*)inpkt->payload.p,  rgb, 3);
 
 	char buffer[1024];
 	// TODO: Get real IP!
 	if (extract_payload("::1", input, buffer)) {
 		printf("Parsed my payload: %s", buffer);
-		parse_payload_rgb(buffer, rgb, 3);
+        rgb = parse_payload_rgb(buffer);
 	} else {
 		return -1;
 	}
         
 	////////////
 	// LED strip
-	for(int i=0;i<MAXPIX;i++)
+	for(int i = 0; i < MAXPIX; i++)
 	{
-		led[i].r = rgb[0];
-		led[i].g = rgb[1];
-		led[i].b = rgb[2];
+		led[i].r = (rgb & 0xff0000) >> 16;
+		led[i].g = (rgb & 0x00ff00) >> 8;
+		led[i].b = rgb & 0x0000ff;
 	}
 
-	ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
+	ws2812_sendarray((uint8_t *) &led, MAXPIX * 3);
 
 	memcpy(response, "TODO", 4);
 

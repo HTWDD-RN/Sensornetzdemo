@@ -64,28 +64,9 @@ int parse_payload(const uint8_t *input, size_t size )
     return( val );
 }
 
-void parse_payload_rgb(const char *input, int *rgb, size_t rgb_size)
+int parse_payload_rgb(const char *input)
 {
-	// RGB in int, splitted by delimiter ;
-	/*char *copy = strdup(input);
-	char delimiter[] = ";";
-	char *splitted_string;
-
-	splitted_string = strtok(copy, delimiter);
-	unsigned int i = 0;
-	while (splitted_string != NULL)
-	{
-	  rgb[i] = atoi(splitted_string);
-	  splitted_string = strtok (NULL, delimiter);
-	  i++;
-	  if(i >= rgb_size) {
-		  splitted_string = NULL;
-		  return;
-	  }
-	}*/
-
-	for(int i=0;i<rgb_size;i++)
-		rgb[i] = (int)strtol(strndup(input + 2 * i, 2),NULL,16);
+    return strtol(input, NULL, 10);
 }
 
 /// input:

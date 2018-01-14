@@ -6,11 +6,10 @@
 #ifndef EXAMPLES_MYCOAPSERVER_MYCOAPSTUFF_H_
 #define EXAMPLES_MYCOAPSERVER_MYCOAPSTUFF_H_
 
-
 #include "xtimer.h"
 #include "periph/gpio.h"
 
- #include <ctype.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,7 +23,7 @@ int set(gpio_t pin);
 int clear(gpio_t pin);
 int toggle(gpio_t pin);
 int parse_payload(const uint8_t *input, size_t size );
-void parse_payload_rgb(const char *input, int *rgb, size_t rgb_size );
+int parse_payload_rgb(const char *input);
 unsigned long extract_payload(char *ip, const char *input, char *output);
 
 

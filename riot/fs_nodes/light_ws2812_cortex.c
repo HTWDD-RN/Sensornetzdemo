@@ -28,7 +28,7 @@
 #define ws2812_DEL16 ws2812_DEL8 ws2812_DEL8
 
 
-void ws2812_sendarray(uint8_t *data,int datlen)
+void ws2812_sendarray(uint8_t *data, int datlen)
 {
 	uint32_t maskhi = ws2812_mask_set;
 	uint32_t masklo = ws2812_mask_clr;

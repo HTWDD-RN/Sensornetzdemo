@@ -5,6 +5,7 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const uuid = require('uuid/v4');
 
+const BORDER_ROUTER_IP = "2001:db8::5855:1277:fb88:4f1e";
 const RESOURCE_IPS = ["2001:db8::5855:1277:fb88:4f1e"];
 
 const dummyResource = {
@@ -166,8 +167,7 @@ exports.update_resource = function (req, res) {
                     return;
                 }
                 console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://", resource.ip + action.actionPath);
-                resourceService.setState(resource.ip, action.actionPath, getPayload(action.type, value), data => {
-
+                resourceService.setState(BORDER_ROUTER_IP, resource.ip, action.actionPath, getPayload(action.type, value), data => {
                 }, console.log.bind(this, "Could not update state."));
                 updateValue(action, value);
                 res.json({ value: action.parameter.current });

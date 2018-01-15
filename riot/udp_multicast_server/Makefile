@@ -24,6 +24,11 @@ CFLAGS += -DDEVELHELP
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+USEPKG += nanocoap
+USEMODULE += posix
+USEMODULE += gnrc_sock_udp
+USEMODULE += gcoap
+
 # Modules to include:
 USEMODULE += shell
 USEMODULE += shell_commands
@@ -33,7 +38,6 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_sock_udp
-
 
 # Routing modules + configuration
 

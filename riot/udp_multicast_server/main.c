@@ -9,7 +9,10 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 extern kernel_pid_t startServer(void);
 
+extern int test_multicast(int argc, char **argv);
+
 static const shell_command_t shell_commands[] = {
+    { "test", "test multicast configuration by pinging all nodes", test_multicast },
     { NULL, NULL, NULL }
 };
 

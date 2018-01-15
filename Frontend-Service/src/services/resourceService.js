@@ -26,7 +26,7 @@ var sendRequest = function (ip, actionPath, payload, success, fail) {
 };
 
 exports.setState = function (ip, nodeIp, actionPath, payload, success, fail) {
-    sendRequest(ip, actionPath, nodeIp + " " + payload, success, fail);
+    sendRequest(ip, actionPath, nodeIp + "#" + payload, success, fail);
 };
 
 /**
@@ -40,7 +40,7 @@ exports.setState = function (ip, nodeIp, actionPath, payload, success, fail) {
 exports.multicast = function (ip, actionPath, data, success, fail) {
     var processedData = "";
     for (let nodeData of data) {
-        processedData += nodeData.ip + " " + nodeData.payload + "\n";
+        processedData += nodeData.ip + "#" + nodeData.payload + "\n";
     }
     sendRequest(ip, actionPath, processedData, success, fail);
 };

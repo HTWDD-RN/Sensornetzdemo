@@ -167,10 +167,11 @@ exports.update_resource = function (req, res) {
                 }
                 console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://", resource.ip + action.actionPath);
                 resourceService.setState(resource.ip, action.actionPath, getPayload(action.type, value), data => {
-                    updateValue(action, data);
-                    res.json({ value: action.parameter.current });
-                    eventEmitter.emit('update', resources);
+
                 }, console.log.bind(this, "Could not update state."));
+                updateValue(action, value);
+                res.json({ value: action.parameter.current });
+                eventEmitter.emit('update', resources);
                 return;
             }
         }
@@ -194,6 +195,7 @@ function loadResources(hosts, completion) {
 }
 
 function loadResource(hostname, callback) {
+    //TODO: add demo node bundling color sequence and image upload functionality
     resourceService.discover(hostname, function (actions) {
         const resource = {};
         resource.id = uuid();

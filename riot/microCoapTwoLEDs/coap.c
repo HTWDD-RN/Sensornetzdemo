@@ -13,15 +13,15 @@
 
 #include "include/myCoapStuff.h"
 #include "include/microCoAPServer.h"
-
-#include "include/light_ws2812_cortex.h"
-
-#include "xtimer.h"
+#include "include/light_ws2812_examples_arm.h"
 
 #define MAX_RESPONSE_LEN 500
 
-#define MAXPIX 6
-struct cRGB led[MAXPIX];
+//#define MAXPIX 6
+//#define COLORLENGTH (MAXPIX/2)
+//#define FADE (8/COLORLENGTH)
+//struct cRGB colors[8];
+//struct cRGB led[MAXPIX];
 
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
@@ -159,21 +159,17 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 	char buffer[1024];
 	if (extract_payload(input, buffer)) {
 		printf("Parsed my payload: %s", buffer);
-        rgb = parse_payload_rgb(buffer);
+        	rgb = parse_payload_rgb(buffer);
 	} else {
 		return -1;
 	}
         
-	////////////
-	// LED strip
-	for(int i = 0; i < MAXPIX; i++)
-	{
-		led[i].r = (rgb & 0xff0000) >> 16;
-		led[i].g = (rgb & 0x00ff00) >> 8;
-		led[i].b = rgb & 0x0000ff;
-	}
+	set_simple_color(rgb);
 
-	ws2812_sendarray((uint8_t *) &led, MAXPIX * 3);
+	//moving_light(rgb, 500000);
+
+	//hsv_crawling_lights(100);
+
 
 	memcpy(response, "TODO", 4);
 

@@ -8,8 +8,9 @@ const MAX_DIMENSION = 100;
  * 
  * @param {string} base64Image 
  * @param {number} containerCount 
+ * @param {function} success
  */
-exports.getDominantColors = function (base64Image, containerCount) {
+exports.getDominantColors = function (base64Image, containerCount, success) {
     const imageData = base64Image.indexOf("base64,") === -1 ? base64Image : base64Image.split("base64,")[1];
     const startTime = new Date().getTime();
     // get colors and put them into containers according to hue
@@ -98,10 +99,13 @@ exports.getDominantColors = function (base64Image, containerCount) {
                 r: parseInt(rSum / lngth),
                 g: parseInt(gSum / lngth),
                 b: parseInt(bSum / lngth),
-                dominance: parseInt(lngth / sum * 100).toString() + "%"
+                dominance: lngth / sum
             });
         }
         console.log(result);
         console.log("Got dominant colors of an image in", (new Date().getTime() - startTime), "ms");
+        if (success !== undefined && typeof success == "function") {
+            success(result);
+        }
     });
 }

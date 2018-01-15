@@ -4,6 +4,8 @@ const resourceService = require('../services/resourceService');
 const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const uuid = require('uuid/v4');
+const imageProcessor = require('../utils/imageProcessor');
+const Color = require("onecolor");
 
 const BORDER_ROUTER_IP = "2001:db8::5855:1277:fb88:4f1e";
 const RESOURCE_IPS = ["2001:db8::5855:1277:fb88:4f1e"];
@@ -61,19 +63,18 @@ const dummyResource = {
     ]
 };
 
-const r2 = {
-    id: "led_b",
-    name: "Node B (LED)",
+const demoResource = {
+    id: "demo_resource",
+    name: "DEMO Node",
     state: "OPEN",
     actions: [
         {
-            id: "led_b_1",
-            name: "an-/ausschalten",
-            type: "SWITCH",
+            id: "demo_resource_image",
+            name: "Bild hochladen",
+            type: "IMAGE_TO_COLOR",
             parameter: {
-                current: 0,
-                on: 1,
-                off: 0
+                current: '',
+                colors: []
             }
         }
     ]
@@ -92,6 +93,40 @@ const findResourceById = function (id) {
     }
     return null;
 };
+
+const getIpByActionId = function (id) {
+    for (let resource of resources) {
+        for (let action of resource.actions) {
+            if (action.id == id) {
+                return resource.ip;
+            }
+        }
+    }
+    return null;
+}
+
+const findActionById = function (id) {
+    for (let resource of resources) {
+        for (let action of resource.actions) {
+            if (action.id == id) {
+                return action;
+            }
+        }
+    }
+    return null;
+}
+
+const findActionsByType = function (type) {
+    const result = [];
+    for (let resource of resources) {
+        for (let action of resource.actions) {
+            if (action.type == type) {
+                result.push(action);
+            }
+        }
+    }
+    return result;
+}
 
 const sendResourceNotFoundResponse = function (res, id) {
     res.status(400).send({ message: "Resource " + id + " not found" });
@@ -122,6 +157,9 @@ function isValidValue(action, value) {
     } else if (action.type == "COLOR_RANGE") {
         const val = parseInt(value);
         return val >= action.parameter.min && val <= action.parameter.max;
+    } else if (action.type == "IMAGE_TO_COLOR") {
+        //TODO: check whether valid base64 image
+        return true;
     }
 
     console.log("Unknown action", action.type);
@@ -135,6 +173,24 @@ function updateValue(action, value) {
         action.parameter.current = parseInt(value);
     } else if (action.type == "COLOR_RANGE") {
         action.parameter.current = parseInt(value);
+    } else if (action.type == "IMAGE_TO_COLOR") {
+        action.parameter.current = value;
+        action.parameter.colors = [];
+        const containerCount = findActionsByType("IMAGE_TO_COLOR").length;
+        if (containerCount === 0) {
+            return;
+        }
+        imageProcessor.getDominantColors(value, containerCount * 2, function (actionId, data) {
+            const action = findActionById(actionId);
+            for (let clr of data) {
+                const hex = new Color("rgb(" + clr.r + "," + clr.g + "," + clr.b + ")").hex().replace("#", "0x");
+                action.parameter.colors.push({
+                    color: parseInt(hex),
+                    dominance: clr.dominance
+                });
+            }
+            eventEmitter.emit('update', resources);
+        }.bind(this, action.id)); //TODO: update nodes
     }
 }
 
@@ -166,10 +222,14 @@ exports.update_resource = function (req, res) {
                     res.status(400).send({ message: 'Invalid value' });
                     return;
                 }
-                console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://", resource.ip + action.actionPath);
-                resourceService.setState(BORDER_ROUTER_IP, resource.ip, action.actionPath, getPayload(action.type, value), data => {
-                }, console.log.bind(this, "Could not update state."));
-                updateValue(action, value);
+                if (action.type == "IMAGE_TO_COLOR") { //actions that are scripted
+                    updateValue(action, value);
+                } else { //actions that are sent directly to the node
+                    console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://" + resource.ip + action.actionPath);
+                    resourceService.setState(BORDER_ROUTER_IP, resource.ip, action.actionPath, getPayload(action.type, value), data => {
+                    }, console.log.bind(this, "Could not update state."));
+                    updateValue(action, value);
+                }
                 res.json({ value: action.parameter.current });
                 eventEmitter.emit('update', resources);
                 return;
@@ -249,6 +309,7 @@ exports.start = function (completion) {
 
     const isDebugMode = process.argv.indexOf("--d") !== -1;
     console.log(isDebugMode ? "Debug mode" : "Release mode");
+    resources.push(demoResource);
     if (!isDebugMode) {
         loadResources(RESOURCE_IPS, completion);
     } else {

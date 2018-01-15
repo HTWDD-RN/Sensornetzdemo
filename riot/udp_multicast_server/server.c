@@ -14,6 +14,7 @@
 #define SERVER_BUFFER_SIZE      (64)
 
 static char *PORTSTRING = "5683";
+static char *MULTICAST_ADDRESS = "ff02::1";
 
 bool sending = false;
 
@@ -58,12 +59,12 @@ int test_multicast(int argc, char **argv) {
     int POST = 2;
     ipv6_addr_t addr;
 
-    if (ipv6_addr_from_str(&addr, "ff02::1") == NULL) {
+    if (ipv6_addr_from_str(&addr, MULTICAST_ADDRESS) == NULL) {
         printf("Invalid address!\n");
         return -1;
     }
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 20; i++) {
         uint8_t buf[GCOAP_PDU_BUF_SIZE];
         coap_pkt_t pdu;
 
@@ -75,8 +76,7 @@ int test_multicast(int argc, char **argv) {
 
         gcoap_req_send(buf, len, &addr, GCOAP_PORT, _resp_handler);
         sending = true;
-        while (sending);
-        printf("test_multicast\n");
+        while (sending); // wait until response arrived
         usleep(500000);
     }
 
@@ -110,7 +110,7 @@ void *_udp_server(void *args)
             printf("Recvd: %s\n", server_buffer);
 
             // send packages as multicast
-            udp_send("ff02::1", server_buffer);
+            udp_send(MULTICAST_ADDRESS, server_buffer);
         }
     }
 

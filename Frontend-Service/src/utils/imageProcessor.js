@@ -2,10 +2,16 @@
 const Jimp = require("jimp");
 const Color = require("onecolor");
 
+/**
+ * 
+ * @param {string} base64Image 
+ * @param {number} containerCount 
+ */
 exports.getDominantColors = function (base64Image, containerCount) {
+    const imageData = base64Image.indexOf("base64,") === -1 ? base64Image : base64Image.split("base64,")[1];
     const startTime = new Date().getTime();
     // get colors and put them into containers according to hue
-    Jimp.read(Buffer.from(base64Image, 'base64'), function (err, img) {
+    Jimp.read(Buffer.from(imageData, 'base64'), function (err, img) {
         if (err) throw err;
         const containers = new Array(containerCount);
         var width = img.bitmap.width;
@@ -94,6 +100,6 @@ exports.getDominantColors = function (base64Image, containerCount) {
             });
         }
         console.log(result);
-        console.log("Got dominant colors of an image in",(new Date().getTime() - startTime), "ms");
+        console.log("Got dominant colors of an image in", (new Date().getTime() - startTime), "ms");
     });
 }

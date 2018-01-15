@@ -2,6 +2,8 @@
 const Jimp = require("jimp");
 const Color = require("onecolor");
 
+const MAX_DIMENSION = 100;
+
 /**
  * 
  * @param {string} base64Image 
@@ -17,10 +19,10 @@ exports.getDominantColors = function (base64Image, containerCount) {
         var width = img.bitmap.width;
         var height = img.bitmap.height;
         //resize for faster processing
-        if (width > height && width > 250) {
-            img.resize(250, Jimp.AUTO);
-        } else if (height > 250) {
-            img.resize(Jimp.AUTO, 250);
+        if (width > height && width > MAX_DIMENSION) {
+            img.resize(MAX_DIMENSION, Jimp.AUTO);
+        } else if (height > MAX_DIMENSION) {
+            img.resize(Jimp.AUTO, MAX_DIMENSION);
         }
         width = img.bitmap.width;
         height = img.bitmap.height;

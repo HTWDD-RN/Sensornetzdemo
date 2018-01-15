@@ -25,3 +25,6 @@ riot/*/myCoapServer/.metadata/
 riot/*/myCoapServer/bin/
 riot/*/myCoapServer/.idea/
 
+
+.idea
+.vscode

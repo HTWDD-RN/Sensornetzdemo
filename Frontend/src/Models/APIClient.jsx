@@ -5,7 +5,8 @@ function url(path) {
 const Path = {
     allResources: "/",
     oneResource: function (id) { return "/" + id },
-    setStatus: function (id, action) { return "/" + id + "/" + action }
+    setStatus: function (id, action) { return "/" + id + "/" + action },
+    uploadImage: function () { return "/imageUpload" }
 }
 
 export default class APIClient {
@@ -16,7 +17,7 @@ export default class APIClient {
         this.onItems = onItems;
 
         const ws = new WebSocket(this.socketUrl);
-        ws.onmessage = e => {            
+        ws.onmessage = e => {
             const items = JSON.parse(e.data) || [];
             this.onItems(items);
         }
@@ -33,17 +34,17 @@ export default class APIClient {
     allResources() {
         const resolvedUrl = url.bind(this)(Path.allResources);
         return fetch(resolvedUrl)
-                .then(res => res.json())
-                .then(res => {
-                    this.onItems(res.response);
-                });
+            .then(res => res.json())
+            .then(res => {
+                this.onItems(res.response);
+            });
     }
 
     oneResource(id) {
         const resolvedUrl = url.bind(this)(Path.oneResource(id));
         return fetch(resolvedUrl)
-                .then(res => res.json())
-                .then(res => res.response);
+            .then(res => res.json())
+            .then(res => res.response);
     }
 
     setStatus(id, action, value) {
@@ -57,7 +58,11 @@ export default class APIClient {
                 'Content-Type': 'application/json'
             }
         })
-        .then(res => res.json())
+            .then(res => res.json())
+    }
+
+    getImageUploadPath() {
+        return this.baseUrl + Path.getImageUploadPath();
     }
 
 }

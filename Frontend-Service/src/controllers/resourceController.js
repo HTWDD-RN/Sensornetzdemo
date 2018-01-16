@@ -213,6 +213,7 @@ function updateValue(action, value) {
                 propagate += percentagePerNode;
             }
             eventEmitter.emit('update', resources);
+            resourceService.multicast(BORDER_ROUTER_IP, "/LED/stripe", parameter);
         }.bind(this, action.id)); //TODO: update nodes
     }
 }
@@ -279,7 +280,7 @@ function loadResources(hosts, completion) {
 function loadResource(hostname, callback) {
     //TODO: add demo node bundling color sequence and image upload functionality
     resourceService.discover(hostname, function (actions) {
-	const resource = {};
+        const resource = {};
         resource.id = uuid();
         resource.name = "Node " + (resources.length + 1).toString();
         resource.state = "OPEN";
@@ -335,15 +336,15 @@ exports.start = function (completion) {
     // if (!isDebugMode) {
     //     loadResources(RESOURCE_IPS, completion);
     // } else {
-        resources.push(dummyResource);
-        // for (let res of resources) {
-        //     res.ip = "vs0.inf.ethz.ch";
-        //     for (let action of res.actions) {
-        //         action.actionPath = "/large-post";
-        //     }
-      //  }
-        console.log("Initialized resources to large-post api @ethz.ch");
-        completion();
+    resources.push(dummyResource);
+    // for (let res of resources) {
+    //     res.ip = "vs0.inf.ethz.ch";
+    //     for (let action of res.actions) {
+    //         action.actionPath = "/large-post";
+    //     }
+    //  }
+    console.log("Initialized resources to large-post api @ethz.ch");
+    completion();
     //}
 };
 

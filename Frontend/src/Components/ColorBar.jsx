@@ -10,9 +10,9 @@ export default class ImageToColorAction extends Component {
             }}>
             </div>
         });
-        console.log(this.props.colors);
         return <div style={{
-            width: '100%'
+            width: '100%',
+            display: 'flex'
         }}>
             {colorItems}
         </div>

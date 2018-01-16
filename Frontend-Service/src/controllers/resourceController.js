@@ -178,7 +178,7 @@ function updateValue(action, value) {
     } else if (action.type == "IMAGE_TO_COLOR") {
         action.parameter.current = value;
         action.parameter.colors = [];
-        action.parameter.base64 =  'data:image/'+value.split(".")[value.split(".").length-1].toLowerCase() + ';base64,'+fs.readFileSync('./static/img/' + value, { encoding: 'base64' }) 
+        action.parameter.base64 = 'data:image/' + value.split(".")[value.split(".").length - 1].toLowerCase() + ';base64,' + fs.readFileSync('./static/img/' + value, { encoding: 'base64' })
         const containerCount = Math.min(findActionsByType("COLOR_RANGE").length, 72);
         if (containerCount === 0) {
             return;

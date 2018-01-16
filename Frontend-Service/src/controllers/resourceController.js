@@ -176,7 +176,7 @@ function updateValue(action, value) {
     } else if (action.type == "IMAGE_TO_COLOR") {
         action.parameter.current = value;
         action.parameter.colors = [];
-        const containerCount = findActionsByType("IMAGE_TO_COLOR").length;
+        const containerCount = Math.min(findActionsByType("COLOR_RANGE").length, 10);
         if (containerCount === 0) {
             return;
         }
@@ -188,6 +188,27 @@ function updateValue(action, value) {
                     color: parseInt(hex),
                     dominance: clr.dominance
                 });
+            }
+            const rgbActions = findActionsByType("COLOR_RANGE");
+            const parameter = [];
+            var propagate = 0;
+            var percentagePerNode = 1 / rgbActions.length;
+            for (var i = 0; i < rgbActions.length; i++) {
+                var val = 0;
+                const rgbAction = rgbActions[i];
+                for (let color of action.parameter.colors) {
+                    val += color.dominance;
+                    if (propagate < val) {
+                        rgbAction.parameter.current = color.color;
+                        parameter.push({
+                            ip: getIpByActionId(rgbAction.id),
+                            payload: color.color
+                        });
+                        console.log(parameter[i]);
+                        break;
+                    }
+                }
+                propagate += percentagePerNode;
             }
             eventEmitter.emit('update', resources);
         }.bind(this, action.id)); //TODO: update nodes

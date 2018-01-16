@@ -11,6 +11,7 @@ const coap = require('./coapService');
  * @param {function} fail
  */
 var sendRequest = function (ip, actionPath, payload, success, fail) {
+    console.log("Sedning request to", ip, "to", actionPath, "; payload=", payload);
     const successWrapper = (dataType, data) => {
         if (success && typeof success == 'function') {
             success(data);

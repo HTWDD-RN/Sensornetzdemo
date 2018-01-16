@@ -99,14 +99,14 @@ exports.post = function (host, pathname, payload, contentFormat, success, fail) 
         console.log(err, pathname);
         if (fail && typeof fail == "function") {
             fail(err);
-            process.exit(-1);
+            // process.exit(-1);
         }
     });
     req.on('timeout',(err)=>{
         console.log(err, pathname);
         if (fail && typeof fail == "function") {
             fail(err);
-            process.exit(-1);
+           // process.exit(-1);
         }
     })
     req.write(payload);

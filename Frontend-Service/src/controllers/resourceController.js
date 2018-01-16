@@ -179,11 +179,11 @@ function updateValue(action, value) {
         action.parameter.current = value;
         action.parameter.colors = [];
         action.parameter.base64 = 'data:image/' + value.split(".")[value.split(".").length - 1].toLowerCase() + ';base64,' + fs.readFileSync('./static/img/' + value, { encoding: 'base64' })
-        const containerCount = Math.min(findActionsByType("COLOR_RANGE").length, 72);
+        const containerCount = Math.max(findActionsByType("COLOR_RANGE").length, 72);
         if (containerCount === 0) {
             return;
         }
-        imageProcessor.getDominantColors(value, containerCount * 2, function (actionId, data) {
+        imageProcessor.getDominantColors(value, containerCount, function (actionId, data) {
             const action = findActionById(actionId);
             for (let clr of data) {
                 const hex = new Color("rgb(" + clr.r + "," + clr.g + "," + clr.b + ")").hex().replace("#", "0x");

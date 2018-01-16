@@ -7,7 +7,10 @@ import fetch from 'isomorphic-fetch';
 export default class ImageToColorAction extends Component {
     render() {
         return <div>
-            <img src={this.props.action.parameter.base64} width="100" />
+            <img src={this.props.action.parameter.base64} style={{
+                width: '100%',
+                maxWidth: '600px'
+            }} />
             <Dropzone
                 multiple={false}
                 accept="image/*"

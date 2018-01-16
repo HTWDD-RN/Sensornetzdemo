@@ -1,4 +1,5 @@
 var cors = require('cors');
+var imagesUpload = require('images-upload-middleware').default;
 var app = require('./app');
 var port = process.env.PORT || 5238;
 var bodyParser = require('body-parser');
@@ -8,6 +9,12 @@ const http = require('http');
 
 // allow all origins
 app.use(cors());
+app.post('/imageUpload', imagesUpload(
+    './static/img',
+    'http://localhost:5238/static/img',
+    true,
+    false
+));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

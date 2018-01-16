@@ -10,11 +10,10 @@ const MAX_DIMENSION = 100;
  * @param {number} containerCount 
  * @param {function} success
  */
-exports.getDominantColors = function (base64Image, containerCount, success) {
-    const imageData = base64Image.indexOf("base64,") === -1 ? base64Image : base64Image.split("base64,")[1];
+exports.getDominantColors = function (imageName, containerCount, success) {
     const startTime = new Date().getTime();
     // get colors and put them into containers according to hue
-    Jimp.read(Buffer.from(imageData, 'base64'), function (err, img) {
+    Jimp.read('./static/img/' + imageName, function (err, img) {
         if (err) throw err;
         const containers = new Array(containerCount);
         var width = img.bitmap.width;

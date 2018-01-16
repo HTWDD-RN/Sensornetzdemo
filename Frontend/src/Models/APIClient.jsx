@@ -62,7 +62,7 @@ export default class APIClient {
     }
 
     getImageUploadPath() {
-        return this.baseUrl + Path.getImageUploadPath();
+        return this.baseUrl + Path.uploadImage();
     }
 
 }

@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const resourceService = require('../services/resourceService');
 const events = require('events');
 const eventEmitter = new events.EventEmitter();
@@ -74,7 +75,8 @@ const demoResource = {
             type: "IMAGE_TO_COLOR",
             parameter: {
                 current: '',
-                colors: []
+                colors: [],
+                base64: ''
             }
         }
     ]
@@ -176,7 +178,8 @@ function updateValue(action, value) {
     } else if (action.type == "IMAGE_TO_COLOR") {
         action.parameter.current = value;
         action.parameter.colors = [];
-        const containerCount = Math.min(findActionsByType("COLOR_RANGE").length, 10);
+        action.parameter.base64 =  'data:image/'+value.split(".")[value.split(".").length-1].toLowerCase() + ';base64,'+fs.readFileSync('./static/img/' + value, { encoding: 'base64' }) 
+        const containerCount = Math.min(findActionsByType("COLOR_RANGE").length, 72);
         if (containerCount === 0) {
             return;
         }

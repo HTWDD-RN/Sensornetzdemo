@@ -35,13 +35,13 @@ const getContentFormat = function (options) {
 /* API */
 
 /**
- * 
+ *
  * Send get request
- * 
+ *
  * @param {string} host
- * @param {string} pathname 
+ * @param {string} pathname
  * @param {function} success success callback, takes two parameters dataType (one of following: 'plain', 'json') and responsePayload
- * @param {function} fail 
+ * @param {function} fail
  */
 exports.get = function (host, pathname, success, fail) {
     const url = {
@@ -69,15 +69,15 @@ exports.get = function (host, pathname, success, fail) {
 };
 
 /**
- * 
+ *
  * Send post request
- * 
- * @param {string} host 
- * @param {string} pathname 
+ *
+ * @param {string} host
+ * @param {string} pathname
  * @param {string} payload
  * @param {string} contentFormat
  * @param {function} success success callback, takes two parameters dataType (one of following: 'plain', 'json') and responsePayload
- * @param {function} fail 
+ * @param {function} fail
  */
 exports.post = function (host, pathname, payload, contentFormat, success, fail) {
     const url = {

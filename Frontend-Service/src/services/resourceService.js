@@ -3,12 +3,12 @@
 const coap = require('./coapService');
 
 /**
- * 
- * @param {string} ip 
- * @param {string} actionPath 
- * @param {string} payload 
- * @param {function} success 
- * @param {function} fail 
+ *
+ * @param {string} ip
+ * @param {string} actionPath
+ * @param {string} payload
+ * @param {function} success
+ * @param {function} fail
  */
 var sendRequest = function (ip, actionPath, payload, success, fail) {
     const successWrapper = (dataType, data) => {
@@ -30,12 +30,12 @@ exports.setState = function (ip, nodeIp, actionPath, payload, success, fail) {
 };
 
 /**
- * 
- * @param {string} ip 
- * @param {string} actionPath 
+ *
+ * @param {string} ip
+ * @param {string} actionPath
  * @param {array} data - array of objects containing node ip and payload, e.g. [{ip: '::2', payload: '1'}]
- * @param {function} success 
- * @param {function} fail 
+ * @param {function} success
+ * @param {function} fail
  */
 exports.multicast = function (ip, actionPath, data, success, fail) {
     var processedData = "";
@@ -46,8 +46,8 @@ exports.multicast = function (ip, actionPath, data, success, fail) {
 };
 
 /**
- * 
- * @param {String} ip - ip address of the requested node 
+ *
+ * @param {String} ip - ip address of the requested node
  * @returns {Array} - raw array containing node resource information
  */
 exports.discover = function (ip, success, fail) {

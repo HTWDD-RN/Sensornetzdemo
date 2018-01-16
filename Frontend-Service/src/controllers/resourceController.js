@@ -9,13 +9,13 @@ const imageProcessor = require('../utils/imageProcessor');
 const Color = require("onecolor");
 
 const BORDER_ROUTER_IP = "2001:db8::5855:1277:fb88:4f1e";
-const RESOURCE_IPS = ["2001:db8::5855:1277:fb88:4f1e"];
+const RESOURCE_IPS = ["2001:db8::585b:1238:1c33:b366"];
 
 const dummyResource = {
     id: "led_a",
     name: "Node A (LED)",
     state: "OPEN",
-    ip: "2001:db8::5855:1277:fb88:4f1e",
+    ip: "2001:db8::585b:1238:1c33:b366",
     actions: [
         {
             id: "led_a_1",
@@ -54,7 +54,7 @@ const dummyResource = {
             id: "led_a_4",
             name: "RGB",
             type: "COLOR_RANGE",
-            actionPath: '/RGB',
+            actionPath: '/LED/strip',
             parameter: {
                 min: 0x000000,
                 max: 0xffffff,
@@ -263,10 +263,10 @@ exports.update_resource = function (req, res) {
 };
 
 /**
- * 
- * @param {... String} hosts - array of host ips 
+ *
+ * @param {... String} hosts - array of host ips
  * @param {Function} completion
- * 
+ *
  */
 function loadResources(hosts, completion) {
     if (hosts.length === 0) {
@@ -279,7 +279,7 @@ function loadResources(hosts, completion) {
 function loadResource(hostname, callback) {
     //TODO: add demo node bundling color sequence and image upload functionality
     resourceService.discover(hostname, function (actions) {
-        const resource = {};
+	const resource = {};
         resource.id = uuid();
         resource.name = "Node " + (resources.length + 1).toString();
         resource.state = "OPEN";
@@ -332,19 +332,19 @@ exports.start = function (completion) {
     const isDebugMode = process.argv.indexOf("--d") !== -1;
     console.log(isDebugMode ? "Debug mode" : "Release mode");
     resources.push(demoResource);
-    if (!isDebugMode) {
-        loadResources(RESOURCE_IPS, completion);
-    } else {
+    // if (!isDebugMode) {
+    //     loadResources(RESOURCE_IPS, completion);
+    // } else {
         resources.push(dummyResource);
-        for (let res of resources) {
-            res.ip = "vs0.inf.ethz.ch";
-            for (let action of res.actions) {
-                action.actionPath = "/large-post";
-            }
-        }
+        // for (let res of resources) {
+        //     res.ip = "vs0.inf.ethz.ch";
+        //     for (let action of res.actions) {
+        //         action.actionPath = "/large-post";
+        //     }
+      //  }
         console.log("Initialized resources to large-post api @ethz.ch");
         completion();
-    }
+    //}
 };
 
 exports.on = function (eventKey, callback) {

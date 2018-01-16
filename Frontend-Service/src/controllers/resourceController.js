@@ -207,7 +207,6 @@ function updateValue(action, value) {
                             ip: getIpByActionId(rgbAction.id),
                             payload: color.color
                         });
-                        console.log(parameter[i]);
                         break;
                     }
                 }
@@ -271,7 +270,6 @@ exports.update_resource = function (req, res) {
  */
 function loadResources(hosts, completion) {
     if (hosts.length === 0) {
-        console.log(JSON.stringify(resources));
         completion();
         return;
     }

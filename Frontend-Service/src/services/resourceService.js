@@ -27,7 +27,7 @@ var sendRequest = function (ip, actionPath, payload, success, fail) {
 };
 
 exports.setState = function (ip, nodeIp, actionPath, payload, success, fail) {
-    sendRequest(ip, actionPath, nodeIp + "#" + payload, success, fail);
+    sendRequest(ip, actionPath, nodeIp + "#" + payload+ "\n", success, fail);
 };
 
 /**

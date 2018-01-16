@@ -59,7 +59,7 @@ exports.get = function (host, pathname, success, fail) {
             fail(err);
             process.exit(-1);
         }
-    }).on('timeout',(err)=>{
+    }).on('timeout', (err) => {
         console.log(err, pathname);
         if (fail && typeof fail == "function") {
             fail(err);
@@ -83,12 +83,14 @@ exports.post = function (host, pathname, payload, contentFormat, success, fail) 
     const url = {
         hostname: host,
         pathname: pathname,
-        method: "POST",
-        headers: {
-            'Content-Format': contentFormat || 'text/plain'
-        }
+        method: "POST"
     };
+    //,
+    //headers: {
+    //    'Content-Format': contentFormat || 'text/plain'
+    //}
     const req = coap.request(url);
+    req.write(payload);
     req.on('response', function (res) {
         const data = processPayload(res.payload, getContentFormat(res.options));
         if (success && typeof success == "function") {
@@ -102,13 +104,12 @@ exports.post = function (host, pathname, payload, contentFormat, success, fail) 
             // process.exit(-1);
         }
     });
-    req.on('timeout',(err)=>{
+    req.on('timeout', (err) => {
         console.log(err, pathname);
         if (fail && typeof fail == "function") {
             fail(err);
-           // process.exit(-1);
+            // process.exit(-1);
         }
     })
-    req.write(payload);
     req.end();
 };

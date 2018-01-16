@@ -28,7 +28,6 @@ app.use(function (req, res) {
 resourceController.start(() => {
     console.log("Turned all LEDs off and updated state.");
     resourceController.on("update", function (data) {
-        console.log("Broadcasting", JSON.stringify(data));
         websocketService.broadcast(JSON.stringify(data));
     });
     const server = http.createServer(app);

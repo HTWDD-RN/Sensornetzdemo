@@ -213,7 +213,7 @@ function updateValue(action, value) {
                 propagate += percentagePerNode;
             }
             eventEmitter.emit('update', resources);
-            resourceService.multicast(BORDER_ROUTER_IP, "/LED/stripe", parameter);
+            resourceService.multicast(BORDER_ROUTER_IP, rgbActions[0].actionPath, parameter, console.log, console.log);
         }.bind(this, action.id)); //TODO: update nodes
     }
 }

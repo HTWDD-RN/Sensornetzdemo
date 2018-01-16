@@ -19,12 +19,12 @@ void led0_blink(gpio_t led0_pin, int times);
 int init_pin(gpio_t pin, gpio_mode_t mode);
 int init_out(gpio_t pin);
 int init_in(gpio_t pin);
-int readPin(gpio_t pin);
+int read(gpio_t pin);
 int set(gpio_t pin);
 int clear(gpio_t pin);
 int toggle(gpio_t pin);
 int parse_payload(const uint8_t *input, size_t size );
 int parse_payload_rgb(const char *input);
-unsigned long extract_payload(char *input, char *output);
+unsigned long extract_payload(const char *input, char *output);
 
 #endif /* EXAMPLES_MYCOAPSERVER_MYCOAPSTUFF_H_ */

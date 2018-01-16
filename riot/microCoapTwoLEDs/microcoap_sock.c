@@ -30,7 +30,9 @@ coap_rw_buffer_t scratch_buf = { scratch_raw, sizeof(scratch_raw) };
  *
  * When using gnrc, make sure the calling thread has an initialized msg queue.
  */
-void microcoap_server_loop(void) {
+void microcoap_server_loop(void)
+{
+
     static const sock_udp_ep_t local = { .family = AF_INET6,
                                          .port = COAP_SERVER_PORT };
     sock_udp_ep_t remote;

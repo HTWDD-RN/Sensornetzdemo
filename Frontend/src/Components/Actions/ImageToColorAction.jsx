@@ -25,7 +25,7 @@ export default class ImageToColorAction extends Component {
     onImageDrop(files) {
         const imageFormData = new FormData();
         imageFormData.append('imageFiles', files[0], files[0].name);
-        let response = fetch(this.props.client.getImageUploadPath(), {
+        fetch(this.props.client.getImageUploadPath(), {
             method: 'POST',
             body: imageFormData,
             headers: {}

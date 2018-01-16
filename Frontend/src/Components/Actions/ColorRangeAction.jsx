@@ -10,7 +10,8 @@ export default class ColorRangeAction extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isDemoRunning: false
+            isDemoRunning: false,
+            timeoutId: -1
         };
         this.lastSentValue = -1;
     }
@@ -49,7 +50,12 @@ export default class ColorRangeAction extends Component {
         if (this.lastSentValue === newColor) return;
         this.lastSentValue = newColor;
 
-        this.props.client.setStatus(this.props.id, this.props.action.id, newColor);
+        clearTimeout(this.state.timeoutId);
+        const timeoutId = setTimeout(function (newColor) {
+            this.props.client.setStatus(this.props.id, this.props.action.id, newColor.toString());
+        }.bind(this, newColor), 200);
+        this.props.action.parameter.current = newColor;
+        this.setState({ timeoutId: timeoutId });
     }
 
     runDemo(isChecked) {

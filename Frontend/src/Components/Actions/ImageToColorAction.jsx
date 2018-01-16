@@ -10,7 +10,7 @@ export default class ImageToColorAction extends Component {
             <img src={this.props.action.parameter.base64} style={{
                 width: '100%',
                 maxWidth: '600px'
-            }} />
+            }} alt="" />
             <Dropzone
                 multiple={false}
                 accept="image/*"

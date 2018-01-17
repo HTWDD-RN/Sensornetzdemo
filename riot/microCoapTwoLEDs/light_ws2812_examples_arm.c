@@ -4,14 +4,18 @@ struct cRGB led[MAXPIX];
 
 void set_simple_color(int rgb)
 {
+  printf(">>>>>>>>> SETTING COLOR %X\n", rgb);
+
 	// set simple color to pixs
-	if(rgb > 16777215)
+	if(rgb < 0 || rgb > 0xffffff)
 	{
-		printf("#ERROR: INVALID COLOR FORMAT! EXAMPLE: ffffff\n");
+		printf("#ERROR: INVALID COLOR FORMAT! GOT (%X), EXPECTED BETWEEN 0x000000 and 0xFFFFFF\n");
 		return;
 	}
 
-	for(int i=0;i<MAXPIX;i++)
+  printf(">>>>>>>>> RED:   %d\n>>>>>>>>> GREEN: %d\n>>>>>>>>> BLUE:  %d\n\n", (rgb & 0xff0000) >> 16, (rgb & 0x00ff00) >> 8, rgb & 0x0000ff);
+
+	for(int i= 0; i < MAXPIX; i++)
 	{
 		led[i].r = (rgb & 0xff0000) >> 16;
 		led[i].g = (rgb & 0x00ff00) >> 8;

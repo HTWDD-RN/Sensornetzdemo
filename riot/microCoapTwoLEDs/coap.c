@@ -156,11 +156,12 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 	int rgb = 0xff0000;
 	const char *input = (const char*)inpkt->payload.p;
 
-	char buffer[1024];
+	char buffer[20];
 	if (extract_payload(input, buffer)) {
-		printf("Parsed my payload: %s", buffer);
-        	rgb = parse_payload_rgb(buffer);
+		printf("Parsed my payload: %s\n", buffer);
+        rgb = parse_payload_rgb(buffer);
 	} else {
+        printf("WARN: Couldn't extract payload (nothing for me?!) [buffer: %s]\n", input);
 		return -1;
 	}
         
@@ -170,8 +171,9 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 
 	//hsv_crawling_lights(100);
 
-
-	memcpy(response, "TODO", 4);
+    char str[8];
+    sprintf(str, "%X", rgb);
+	memcpy(response, rgb, sizeof(rgb));
 
 	return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
 	                          id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,

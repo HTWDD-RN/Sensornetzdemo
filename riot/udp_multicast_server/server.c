@@ -54,8 +54,8 @@ int test_multicast(int argc, char **argv) {
     (void)argv;
 
     char *path = "/LED/strip";
-    char *payloadOff = "ff02::1#0;"; // 0x000000 -> 100% off
-    char *payloadOn = "ff02::1#16711680;"; // 0xff0000 -> 100% red
+    char *payloadOff = "ff02::1#0"; // 0x000000 -> 100% off
+    char *payloadOn = "ff02::1#16711680"; // 0xff0000 -> 100% red
     int POST = 2;
     ipv6_addr_t addr;
 

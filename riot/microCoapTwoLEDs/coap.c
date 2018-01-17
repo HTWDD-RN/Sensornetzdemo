@@ -159,7 +159,7 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 	char buffer[20];
 	if (extract_payload(input, buffer)) {
 		printf("Parsed my payload: %s\n", buffer);
-        rgb = parse_payload_rgb(buffer);
+        	rgb = parse_payload_rgb(buffer);
 	} else {
         printf("WARN: Couldn't extract payload (nothing for me?!) [buffer: %s]\n", input);
 		return -1;
@@ -170,6 +170,8 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 	//moving_light(rgb, 500000);
 
 	//hsv_crawling_lights(100);
+
+	//pulsating_light_waves();
 
     char str[8];
     sprintf(str, "%X", rgb);

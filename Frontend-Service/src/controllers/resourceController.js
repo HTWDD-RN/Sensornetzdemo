@@ -8,8 +8,8 @@ const uuid = require("uuid/v4");
 const imageProcessor = require("../utils/imageProcessor");
 const Color = require("onecolor");
 
-const BORDER_ROUTER_IP = "2001:db8::5855:1277:fb88:4f1e";
-const RESOURCE_IPS = ["2001:db8::585b:1238:1c33:b366"];
+const BORDER_ROUTER_IP = "2001:db8::585b:2b2f:c1dd:98c6";
+const RESOURCE_IPS = ["2001:db8::585b:1238:1c33:b366","2001:db8::585a:1f03:382e:891a"];
 
 const dummyResource = {
   id: "led_a",
@@ -17,39 +17,39 @@ const dummyResource = {
   state: "OPEN",
   ip: "2001:db8::585b:1238:1c33:b366",
   actions: [
-    {
-      id: "led_a_1",
-      name: "Grüne LED",
-      type: "SWITCH",
-      actionPath: "/LED/green",
-      parameter: {
-        current: 0,
-        on: 1,
-        off: 0
-      }
-    },
-    {
-      id: "led_a_2",
-      name: "Rote LED",
-      type: "SWITCH",
-      actionPath: "/LED/red",
-      parameter: {
-        current: 0,
-        on: 1,
-        off: 0
-      }
-    },
-    {
-      id: "led_a_3",
-      name: "Dimmer",
-      type: "RANGE",
-      actionPath: "/DIMMER",
-      parameter: {
-        current: 127,
-        min: 0,
-        max: 255
-      }
-    },
+    // {
+    //   id: "led_a_1",
+    //   name: "Grüne LED",
+    //   type: "SWITCH",
+    //   actionPath: "/LED/green",
+    //   parameter: {
+    //     current: 0,
+    //     on: 1,
+    //     off: 0
+    //   }
+    // },
+    // {
+    //   id: "led_a_2",
+    //   name: "Rote LED",
+    //   type: "SWITCH",
+    //   actionPath: "/LED/red",
+    //   parameter: {
+    //     current: 0,
+    //     on: 1,
+    //     off: 0
+    //   }
+    // },
+    // {
+    //   id: "led_a_3",
+    //   name: "Dimmer",
+    //   type: "RANGE",
+    //   actionPath: "/DIMMER",
+    //   parameter: {
+    //     current: 127,
+    //     min: 0,
+    //     max: 255
+    //   }
+    // },
     {
       id: "led_a_4",
       name: "RGB",
@@ -63,7 +63,25 @@ const dummyResource = {
     }
   ]
 };
-
+const multicastResource = {
+  id: "led_m",
+  name: "Node M (LED)",
+  state: "OPEN",
+  ip: "ff02::1",
+  actions: [
+    {
+      id: "led_m_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    }
+  ]
+};
 const demoResource = {
   id: "demo_resource",
   name: "DEMO Node",
@@ -78,31 +96,13 @@ const demoResource = {
         colors: [],
         base64: ""
       }
-    },
-    {
-      id: "demo_resource_color_sequence_unicast",
-      name: "Color Sequence - Unicast",
-      type: "COLOR_SEQUENCE_UNICAST",
-      parameter: {
-        color: 0x7f7f7f,
-        isRunning: false
-      }
-    },
-    {
-      id: "demo_resource_color_sequence_multicast",
-      name: "Color Sequence - Multicast",
-      type: "COLOR_SEQUENCE_MULTICAST",
-      parameter: {
-        color: 0x7f7f7f,
-        isRunning: false
-      }
     }
   ]
 };
 
 const resources = [];
 
-const findResourceById = function (id) {
+const findResourceById = function(id) {
   for (var i = 0; i < resources.length; i++) {
     const resource = resources[i];
     if (resource.id == id) {
@@ -112,7 +112,7 @@ const findResourceById = function (id) {
   return null;
 };
 
-const getIpByActionId = function (id) {
+const getIpByActionId = function(id) {
   for (let resource of resources) {
     for (let action of resource.actions) {
       if (action.id == id) {
@@ -123,7 +123,7 @@ const getIpByActionId = function (id) {
   return null;
 };
 
-const findActionById = function (id) {
+const findActionById = function(id) {
   for (let resource of resources) {
     for (let action of resource.actions) {
       if (action.id == id) {
@@ -134,7 +134,7 @@ const findActionById = function (id) {
   return null;
 };
 
-const findActionsByType = function (type) {
+const findActionsByType = function(type) {
   const result = [];
   for (let resource of resources) {
     for (let action of resource.actions) {
@@ -146,16 +146,16 @@ const findActionsByType = function (type) {
   return result;
 };
 
-const sendResourceNotFoundResponse = function (res, id) {
+const sendResourceNotFoundResponse = function(res, id) {
   res.status(400).send({ message: "Resource " + id + " not found" });
 };
 
-exports.get_resources = function (req, res) {
+exports.get_resources = function(req, res) {
   const response = { response: resources };
   res.json(response);
 };
 
-exports.get_resource = function (req, res) {
+exports.get_resource = function(req, res) {
   const id = req.params.resourceId;
   const resource = findResourceById(id);
   if (!resource) {
@@ -178,9 +178,6 @@ function isValidValue(action, value) {
   } else if (action.type == "IMAGE_TO_COLOR") {
     //TODO: check whether image exists
     return true;
-  } else if (action.type == "COLOR_SEQUENCE_UNICAST" || action.type == "COLOR_SEQUENCE_MULTICAST") {
-    const data = value.split("#");
-    return data.length == 2 && (data[0] == "true" || data[0] == "false") && !Number.isNaN(parseInt(data[1]));
   }
 
   console.log("Unknown action", action.type);
@@ -196,7 +193,7 @@ function updateValue(action, value) {
     action.parameter.current = parseInt(value);
   } else if (action.type == "IMAGE_TO_COLOR") {
     action.parameter.current = value;
-    imageProcessor.encodeBase64(value, 400, function (data) {
+    imageProcessor.encodeBase64(value, 400, function(data) {
       action.parameter.colors = [];
       action.parameter.base64 = data;
       const containerCount = Math.max(
@@ -209,7 +206,7 @@ function updateValue(action, value) {
       imageProcessor.getDominantColors(
         data,
         containerCount,
-        function (actionId, data) {
+        function(actionId, data) {
           const action = findActionById(actionId);
           for (let clr of data) {
             const hex = new Color(
@@ -253,41 +250,7 @@ function updateValue(action, value) {
         }.bind(this, action.id)
       ); //TODO: update nodes
     });
-  } else if (action.type == "COLOR_SEQUENCE_UNICAST") {
-    const isRunning = value.split("#")[0];
-    const color = parseInt(value.split("#")[1]);
-    action.parameter.isRunning = isRunning == "true" ? true : false;
-    action.parameter.color = color;
-
-    const actions = findActionsByType("COLOR_RANGE");
-    for (let action of actions) {
-      action.parameter.current = color;
-      resourceService.setState(BORDER_ROUTER_IP, getIpByActionId(action.id), action.actionPath, getPayload(action.type, action.parameter.current),
-        data => { },
-        console.log.bind(this, "Could not update state.")
-      );
-    }
-
-    eventEmitter.emit("update", resources);
-  } else if (action.type == "COLOR_SEQUENCE_MULTICAST") {
-    const isRunning = value.split("#")[0];
-    const color = parseInt(value.split("#")[1]);
-
-    action.parameter.isRunning = isRunning == "true" ? true : false;
-    action.parameter.color = color;
-
-    const parameter = [];
-    const actions = findActionsByType("COLOR_RANGE");
-    for (let action of actions) {
-      action.parameter.current = color;
-      parameter.push({
-        ip: getIpByActionId(action.id),
-        payload: action.parameter.current
-      });
-    }
-    resourceService.multicast(BORDER_ROUTER_IP, actions[0].actionPath, parameter, console.log, console.log);
-
-    eventEmitter.emit("update", resources);
+    //      action.parameter.base64 = 'data:image/' + value.split(".")[value.split(".").length - 1].toLowerCase() + ';base64,' + fs.readFileSync('./static/img/' + value, { encoding: 'base64' })
   }
 }
 
@@ -302,7 +265,7 @@ function getPayload(actionType, value) {
   return "";
 }
 
-exports.update_resource = function (req, res) {
+exports.update_resource = function(req, res) {
   const resourceId = req.params.resourceId;
   const actionId = req.params.actionId;
   const value = req.body.value;
@@ -322,7 +285,7 @@ exports.update_resource = function (req, res) {
           res.status(400).send({ message: "Invalid value" });
           return;
         }
-        if (action.type == "IMAGE_TO_COLOR" || action.type == "COLOR_SEQUENCE_UNICAST" || action.type == "COLOR_SEQUENCE_MULTICAST") {
+        if (action.type == "IMAGE_TO_COLOR") {
           //actions that are scripted
           updateValue(action, value);
         } else {
@@ -341,7 +304,7 @@ exports.update_resource = function (req, res) {
             resource.ip,
             action.actionPath,
             getPayload(action.type, value),
-            data => { },
+            data => {},
             console.log.bind(this, "Could not update state.")
           );
           updateValue(action, value);
@@ -351,14 +314,16 @@ exports.update_resource = function (req, res) {
         return;
       }
     }
-    res.status(400).send({
-      message:
-        "Action " +
-        actionId +
-        " does not exist (resourceId: " +
-        resourceId +
-        ")"
-    });
+    res
+      .status(400)
+      .send({
+        message:
+          "Action " +
+          actionId +
+          " does not exist (resourceId: " +
+          resourceId +
+          ")"
+      });
   }
 };
 
@@ -380,7 +345,7 @@ function loadResource(hostname, callback) {
   //TODO: add demo node bundling color sequence and image upload functionality
   resourceService.discover(
     hostname,
-    function (actions) {
+    function(actions) {
       const resource = {};
       resource.id = uuid();
       resource.name = "Node " + (resources.length + 1).toString();
@@ -396,7 +361,7 @@ function loadResource(hostname, callback) {
       resources.push(resource);
       callback();
     },
-    function () {
+    function() {
       console.error("Could not load", hostname);
       callback();
     }
@@ -426,7 +391,7 @@ function processAction(rawAction) {
   return undefined;
 }
 
-exports.start = function (completion) {
+exports.start = function(completion) {
   let objs = [];
   for (let res of resources) {
     for (let action of res.actions) {
@@ -440,6 +405,7 @@ exports.start = function (completion) {
 
   const isDebugMode = process.argv.indexOf("--d") !== -1;
   console.log(isDebugMode ? "Debug mode" : "Release mode");
+ resources.push(multicastResource);
   resources.push(demoResource);
   // if (!isDebugMode) {
   //     loadResources(RESOURCE_IPS, completion);
@@ -456,6 +422,6 @@ exports.start = function (completion) {
   //}
 };
 
-exports.on = function (eventKey, callback) {
+exports.on = function(eventKey, callback) {
   eventEmitter.on(eventKey, callback);
 };

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { ChromePicker } from 'react-color';
-import Switch from 'react-ios-switch';
 import './ColorRangeAction.css';
 
 export default class ColorRangeAction extends Component {

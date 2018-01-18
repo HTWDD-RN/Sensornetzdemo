@@ -96,6 +96,24 @@ const demoResource = {
         colors: [],
         base64: ""
       }
+    },
+    {
+      id: "demo_resource_color_sequence_unicast",
+      name: "Color Sequence - Unicast",
+      type: "COLOR_SEQUENCE_UNICAST",
+      parameter: {
+        color: 0x7f7f7f,
+        isRunning: false
+      }
+    },
+    {
+      id: "demo_resource_color_sequence_multicast",
+      name: "Color Sequence - Multicast",
+      type: "COLOR_SEQUENCE_MULTICAST",
+      parameter: {
+        color: 0x7f7f7f,
+        isRunning: false
+      }
     }
   ]
 };

@@ -21,7 +21,10 @@ bool sending = false;
 static sock_udp_t sock;
 static char server_buffer[SERVER_BUFFER_SIZE];
 static char server_stack[THREAD_STACKSIZE_DEFAULT];
+static char mutlicast_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t server_msg_queue[SERVER_MSG_QUEUE_SIZE];
+
+kernel_pid_t multicast_pid = KERNEL_PID_UNDEF;
 
 int udp_send(char *addr, char *payload)
 {
@@ -46,6 +49,19 @@ void _resp_handler(unsigned req_state, coap_pkt_t* pdu) {
     (void) req_state;
     (void) pdu;
     sending = false;
+}
+
+void *_multicast_event_loop(void *args) {
+    (void)args;
+
+    while (1) {
+        msg_t msg;
+        msg_receive(&msg);
+        char *content = (char *)msg.content.value;
+        udp_send(MULTICAST_ADDRESS, content);
+        free(content);
+    }
+    return NULL;
 }
 
 int test_multicast(int argc, char **argv) {
@@ -92,6 +108,12 @@ void *_udp_server(void *args)
         return NULL;
     }
 
+    // start thread for multicast sending if not started already
+    if (multicast_pid == KERNEL_PID_UNDEF) {
+        multicast_pid = thread_create(mutlicast_stack, sizeof(mutlicast_stack), THREAD_PRIORITY_MAIN - 1,
+                    THREAD_CREATE_STACKTEST, _multicast_event_loop, NULL, "Multicast Loop");
+    }
+
     printf("Success: started UDP server on port %u\n", server.port);
 
     while (1) {
@@ -110,7 +132,11 @@ void *_udp_server(void *args)
             printf("Recvd: %s\n", server_buffer);
 
             // send packages as multicast
-            udp_send(MULTICAST_ADDRESS, server_buffer);
+            msg_t msg;
+            char *msg_content = malloc(sizeof(server_buffer));
+            strcpy(msg_content, server_buffer);
+            msg.content.value = (int)msg_content;
+            msg_try_send(&msg, multicast_pid);
         }
     }
 

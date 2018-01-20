@@ -13,9 +13,9 @@ const RESOURCE_IPS = ["2001:db8::585b:1238:1c33:b366", "2001:db8::585a:1f03:382e
 
 const dummyResource = {
   id: "led_a",
-  name: "Node A (LED)",
+  name: "Node A",
   state: "OPEN",
-  ip: "2001:db8::585b:1238:1c33:b366",
+  ip: "2001:db8::585a:1f03:382e:891a",
   actions: [
     // {
     //   id: "led_a_1",
@@ -63,9 +63,28 @@ const dummyResource = {
     }
   ]
 };
+const dummyResource2 = {
+  id: "led_b",
+  name: "Node B",
+  state: "OPEN",
+  ip: "2001:db8::585b:1801:4b51:d932",
+  actions: [
+    {
+      id: "led_b_4",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    }
+  ]
+};
 const multicastResource = {
   id: "led_m",
-  name: "Node M (LED)",
+  name: "Multicast",
   state: "OPEN",
   ip: "ff02::1",
   actions: [
@@ -97,15 +116,15 @@ const demoResource = {
         base64: ""
       }
     },
-    {
-      id: "demo_resource_color_sequence_unicast",
-      name: "Color Sequence - Unicast",
-      type: "COLOR_SEQUENCE_UNICAST",
-      parameter: {
-        color: 0x7f7f7f,
-        isRunning: false
-      }
-    },
+    // {
+    //   id: "demo_resource_color_sequence_unicast",
+    //   name: "Color Sequence - Unicast",
+    //   type: "COLOR_SEQUENCE_UNICAST",
+    //   parameter: {
+    //     color: 0x7f7f7f,
+    //     isRunning: false
+    //   }
+    // },
     {
       id: "demo_resource_color_sequence_multicast",
       name: "Color Sequence - Multicast",
@@ -466,6 +485,7 @@ exports.start = function (completion) {
   //     loadResources(RESOURCE_IPS, completion);
   // } else {
   resources.push(dummyResource);
+  resources.push(dummyResource2);
   // for (let res of resources) {
   //     res.ip = "vs0.inf.ethz.ch";
   //     for (let action of res.actions) {

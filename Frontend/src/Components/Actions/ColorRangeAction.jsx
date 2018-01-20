@@ -6,9 +6,7 @@ export default class ColorRangeAction extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            lastUpdateTime: -1
-        };
+        this.lastUpdateTime = -1;
         this.lastSentValue = -1;
     }
 
@@ -43,10 +41,11 @@ export default class ColorRangeAction extends Component {
         this.lastSentValue = newColor;
 
         var currTime = new Date().getTime();
-        if (currTime - this.state.lastUpdateTime > 200) {
+        // comment in if we still have problems with the border router response rate
+        // if (currTime - this.lastUpdateTime > 200) {
             this.props.client.setStatus(this.props.id, this.props.action.id, newColor.toString());
-            this.setState({ lastUpdateTime: currTime });
-        }
+            this.lastUpdateTime = currTime;
+        // }
         this.props.action.parameter.current = newColor;
     }
 }

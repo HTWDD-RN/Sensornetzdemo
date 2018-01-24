@@ -165,6 +165,8 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 		return -1;
 	}
   
+  set_simple_color(rgb);
+
   /* UPDATE thread msg */
   // _main_msg_queue[0] = action type;
 

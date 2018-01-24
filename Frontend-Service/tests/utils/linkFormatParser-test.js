@@ -4,7 +4,7 @@ const Parser = require("../../src/utils/linkFormatParser");
 
 describe('LinkFormatParser', function () {
     it('Link Format Parser returns correct JSON (simple input)', function () {
-        const res = Parser.parse(" </.well-known/core>;ct=40,</LED/green>;ct=0;rt=LED;val=1;name=MyLovelyLED;node=PrimarkBillboard");
+        const res = Parser.parse("</.well-known/core>;ct=40,</LED/green>;ct=0;rt=LED;val=1;name=MyLovelyLED;node=PrimarkBillboard");
         expect(res.length).to.equal(2);
         const first = res[0];
         const second = res[1];

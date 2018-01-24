@@ -164,14 +164,11 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
         printf("WARN: Couldn't extract payload (nothing for me?!) [buffer: %s]\n", input);
 		return -1;
 	}
-        
-	set_simple_color(rgb);
+  
+  /* UPDATE thread msg */
+  // _main_msg_queue[0] = action type;
 
-	//moving_light(rgb, 500000);
-
-	//hsv_crawling_lights(100);
-
-	//pulsating_light_waves();
+  
 
     char str[8];
     sprintf(str, "%X", rgb);

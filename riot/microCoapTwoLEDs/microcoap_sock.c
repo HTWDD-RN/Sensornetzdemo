@@ -15,7 +15,6 @@
 #define ENABLE_DEBUG (0)
 #endif
 #include "debug.h"
-
 #include "coap.h"
 
 static uint8_t _udp_buf[512];   /* udp read buffer (max udp payload size) */

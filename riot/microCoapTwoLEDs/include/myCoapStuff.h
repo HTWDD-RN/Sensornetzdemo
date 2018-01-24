@@ -15,6 +15,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "msg.h"
+#include "shell.h"
+#include "thread.h"
+
+#define MAIN_QUEUE_SIZE (8)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
+static char thread_stack[THREAD_STACKSIZE_DEFAULT];
+
+void *_event_loop(void *args);
+void startThread(void);
+
 void led0_blink(gpio_t led0_pin, int times);
 int init_pin(gpio_t pin, gpio_mode_t mode);
 int init_out(gpio_t pin);

@@ -29,13 +29,10 @@
 // compatibility with the Arduino IDE, we also fall back to pin 0 here, if the
 // RIOT macro is not available
 
-
-
 void microcoap_server_loop(void);
 
 /* import "ifconfig" shell command, used for printing addresses */
 extern int _netif_config(int argc, char **argv);
-
 
 int main(void)
 {
@@ -55,6 +52,9 @@ int main(void)
     /* print network addresses */
     puts("Configured network interfaces:");
     _netif_config(0, NULL);
+
+    /* start thread */
+    startThread();
 
     /* start coap server loop */
     microcoap_server_loop();

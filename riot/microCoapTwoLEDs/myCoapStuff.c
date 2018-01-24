@@ -7,6 +7,57 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/ipv6/netif.h"
 
+kernel_pid_t thread_pid = KERNEL_PID_UNDEF;
+
+enum { 
+    NONE = 0,
+    SET_COLOR = 1, 
+    MOVING_LIGHT = 2, 
+    HSV_COLOR = 3, 
+    LIGHT_WAVES = 4
+};
+
+int action = 0;
+
+void *_event_loop(void *args) {
+    (void) args; // to ignore unused parameter warning
+    msg_t msg; // the message to receive
+
+    printf("Thread is now running. PID: %d. Args: %p\n", thread_getpid(), args);
+    while(1) {
+        if (msg_try_receive(&msg) != -1) {
+            // message was received
+            int content = msg.content.value;
+            printf(">>> Received: %d\n", content);
+
+            // set action type 
+            action = content;
+        }
+
+        switch(action) // switch for action type
+        {
+            case SET_COLOR:
+                set_simple_color(rgb);
+            break;
+            case MOVING_LIGHT:
+                moving_light(rgb, 500000);
+            break;
+            case HSV_COLOR:
+                hsv_crawling_lights(100);
+            break;
+            case LIGHT_WAVES:
+                pulsating_light_waves();
+            break;
+            default NONE: break;
+        }
+    }
+}
+
+void startThread(void) {
+    thread_pid = thread_create(thread_stack, sizeof(thread_stack), THREAD_PRIORITY_MAIN - 1,
+                      THREAD_CREATE_STACKTEST, _event_loop, NULL, "Eventloop");
+}
+
 void led0_blink(gpio_t led0_pin, int times)
 {
 		/* initialize the on-board LED */

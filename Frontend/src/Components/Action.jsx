@@ -4,6 +4,7 @@ import RangeAction from './Actions/RangeAction';
 import ColorRangeAction from './Actions/ColorRangeAction';
 import ImageToColorAction from './Actions/ImageToColorAction';
 import ColorSequenceAction from './Actions/ColorSequenceAction'
+import AnimationAction from './Actions/AnimationAction'
 
 class ErrorActionComponent extends Component {
     render() {
@@ -26,6 +27,7 @@ export default function Action(props) {
         case 'IMAGE_TO_COLOR': return <ImageToColorAction action={action} id={id} client={client} />;
         case 'COLOR_SEQUENCE_UNICAST': return <ColorSequenceAction action={action} id={id} client={client} />;
         case 'COLOR_SEQUENCE_MULTICAST': return <ColorSequenceAction action={action} id={id} client={client} />;
+        case 'ANIMATION': return <AnimationAction action={action} id={id} client={client} />;
         default: return <ErrorActionComponent action={action} />;
     }
 }

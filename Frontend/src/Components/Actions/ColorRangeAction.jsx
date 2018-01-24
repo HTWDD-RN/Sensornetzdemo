@@ -42,10 +42,10 @@ export default class ColorRangeAction extends Component {
 
         var currTime = new Date().getTime();
         // comment in if we still have problems with the border router response rate
-        // if (currTime - this.lastUpdateTime > 200) {
+        if (currTime - this.lastUpdateTime > 42) {
             this.props.client.setStatus(this.props.id, this.props.action.id, newColor.toString());
             this.lastUpdateTime = currTime;
-        // }
+        }
         this.props.action.parameter.current = newColor;
     }
 }

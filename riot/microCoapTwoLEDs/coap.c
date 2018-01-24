@@ -90,15 +90,15 @@ const coap_endpoint_t endpoints[] =
     { COAP_METHOD_GET,	handle_get_riot_board,
         &path_riot_board,	   "ct=0"  },
     { COAP_METHOD_POST,	handle_get_toggle_red,
-		    &path_toggle_red,	   "ct=0"  },
+		    &path_toggle_red,	   "ct=0;rt=switch"  },
     { COAP_METHOD_POST,	handle_get_toggle_green,
-  		  &path_toggle_green,	   "ct=0"  },
+  		  &path_toggle_green,	   "ct=0;rt=switch"  },
     { COAP_METHOD_POST,	handle_get_seconds_led0_blink,
 		    &path_led0_blink,	   "ct=0"  },
     { COAP_METHOD_POST,	handle_post_led_strip,
-		    &path_led_strip,	   "ct=0"  },
+		    &path_led_strip,	   "ct=0;rt=rgb"  },
     { COAP_METHOD_POST, handle_post_led_animation,
-        &path_led_animation, "ct=0"  },
+        &path_led_animation, "ct=0;rt=animation"  },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };

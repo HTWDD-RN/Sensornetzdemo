@@ -33,7 +33,6 @@ const parseResourceField = function (elem) {
 };
 
 const parseUrl = function (urlField) {
-  console.log(urlField);
     var url = urlField;
     if (url.startsWith("<")) {
         url = url.substring("1");
@@ -41,20 +40,18 @@ const parseUrl = function (urlField) {
     if (url[url.length - 1] == ">") {
         url = url.substring(0, url.length - 1);
     }
-    console.log(url);
     return url;
 }
 
 exports.parse = function (data) {
-  console.log(data);
     const response = [];
     const resources = data.split(",<");
-    console.log(resources);
     for (var i = 0; i < resources.length; i++) {
-        var item = resources[i];
+        var item = resources[i].trim();
         if (!item.startsWith("<")) {
             item = "<" + item;
         }
+
         response.push(parseResource(item));
     }
     return response;

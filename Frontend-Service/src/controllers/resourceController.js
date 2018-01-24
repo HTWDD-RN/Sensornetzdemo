@@ -60,6 +60,15 @@ const dummyResource = {
         max: 0xffffff,
         current: 0x7f7f7f
       }
+    }, {
+      id: "led_a_5",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: ["Wave", "Blabla", "Blabla2", "None"],
+        current: "None"
+      }
     }
   ]
 };
@@ -218,6 +227,8 @@ function isValidValue(action, value) {
   } else if (action.type == "COLOR_SEQUENCE_UNICAST" || action.type == "COLOR_SEQUENCE_MULTICAST") {
     const data = value.split("#");
     return data.length == 2 && (data[0] == "true" || data[0] == "false") && !Number.isNaN(parseInt(data[1]));
+  } else if (action.type == "ANIMATION") {
+    return action.parameter.options.indexOf(value)!==-1;
   }
 
   console.log("Unknown action", action.type);
@@ -231,6 +242,8 @@ function updateValue(action, value) {
     action.parameter.current = parseInt(value);
   } else if (action.type == "COLOR_RANGE") {
     action.parameter.current = parseInt(value);
+  } else if (action.type == "ANIMATION") {
+    action.parameter.current = value;
   } else if (action.type == "IMAGE_TO_COLOR") {
     action.parameter.current = value;
     imageProcessor.encodeBase64(value, 400, function (data) {
@@ -329,12 +342,10 @@ function updateValue(action, value) {
 }
 
 function getPayload(actionType, value) {
-  if (
-    actionType == "SWITCH" ||
-    actionType == "RANGE" ||
-    actionType == "COLOR_RANGE"
-  ) {
+  if (actionType == "SWITCH" || actionType == "RANGE" || actionType == "COLOR_RANGE") {
     return value.toString();
+  }else if(actionType=="ANIMATION"){
+    //TODO: get payload - color + animation type
   }
   return "";
 }

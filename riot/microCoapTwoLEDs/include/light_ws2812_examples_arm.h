@@ -13,7 +13,7 @@ void set_simple_color(int rgb);
 /*
 default: _delay_us=500000
 */
-void moving_light(int rgb, int _delay_us, int state);
+void moving_light(int rgb, int _delay_us, int *state);
 
 /*
 default: intensity=100

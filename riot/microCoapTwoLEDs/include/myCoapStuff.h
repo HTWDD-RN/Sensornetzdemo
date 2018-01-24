@@ -22,6 +22,19 @@
 #define MAIN_QUEUE_SIZE (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
+typedef enum action { 
+    NONE = 0,
+    SET_COLOR = 1, 
+    MOVING_LIGHT = 2, 
+    HSV_COLOR = 3, 
+    LIGHT_WAVES = 4
+} ACTION;
+
+typedef struct {
+    ACTION action;
+    int parameter;
+} message_content;
+
 static char thread_stack[THREAD_STACKSIZE_DEFAULT];
 
 void *_event_loop(void *args);

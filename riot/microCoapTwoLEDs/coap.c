@@ -23,6 +23,8 @@
 //struct cRGB colors[8];
 //struct cRGB led[MAXPIX];
 
+extern kernel_pid_t animation_pid;
+
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
@@ -215,7 +217,12 @@ static int handle_post_led_animation(coap_rw_buffer_t *scratch,
   /* UPDATE thread msg */
   // _main_msg_queue[0] = action type;
 
-  
+  message_content *msg_content = malloc(sizeof(message_content));
+  msg_content->action = SET_COLOR;
+  msg_content->parameter = 0xff0000;
+  msg_t msg;
+  msg.content.value = (int)msg_content;
+  msg_send(&msg, animation_pid);
 
  //    char str[12];
  //    sprintf(str, "%X\0", rgb);

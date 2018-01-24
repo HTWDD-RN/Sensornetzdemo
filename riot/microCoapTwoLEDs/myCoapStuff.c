@@ -7,55 +7,53 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/ipv6/netif.h"
 
-kernel_pid_t thread_pid = KERNEL_PID_UNDEF;
-
-enum { 
-    NONE = 0,
-    SET_COLOR = 1, 
-    MOVING_LIGHT = 2, 
-    HSV_COLOR = 3, 
-    LIGHT_WAVES = 4
-};
-
-int action = 0;
+kernel_pid_t animation_pid = KERNEL_PID_UNDEF;
 
 void *_event_loop(void *args) {
     (void) args; // to ignore unused parameter warning
     msg_t msg; // the message to receive
     int state = 0; // the state used in the animations
 
+    ACTION action = 0;
+    int parameter = 0;
+
     printf("Thread is now running. PID: %d. Args: %p\n", thread_getpid(), args);
     while(1) {
         if (msg_try_receive(&msg) != -1) {
             // message was received
-            int content = msg.content.value;
+            message_content *content;
+            content = (message_content *)msg.content.value;
             printf(">>> Received: %d\n", content);
 
             // set action type 
-            action = content;
+            action = content->action;
+            parameter = content->parameter;
+            state = 0; // reset state
+            free(content);
         }
 
         switch(action) // switch for action type
         {
             case SET_COLOR:
-                set_simple_color(rgb);
-            break;
+                set_simple_color(parameter);
+                break;
             case MOVING_LIGHT:
-                moving_light(rgb, 500000, &state);
-            break;
+                moving_light(parameter, 500000, &state);
+                break;
             case HSV_COLOR:
                 hsv_crawling_lights(100);
-            break;
+                break;
             case LIGHT_WAVES:
                 pulsating_light_waves();
-            break;
-            default NONE: break;
+                break;
+            default: 
+                break;
         }
     }
 }
 
 void startThread(void) {
-    thread_pid = thread_create(thread_stack, sizeof(thread_stack), THREAD_PRIORITY_MAIN - 1,
+    animation_pid = thread_create(thread_stack, sizeof(thread_stack), THREAD_PRIORITY_MAIN - 1,
                       THREAD_CREATE_STACKTEST, _event_loop, NULL, "Eventloop");
 }
 

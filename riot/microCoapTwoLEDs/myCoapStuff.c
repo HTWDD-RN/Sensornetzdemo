@@ -22,6 +22,7 @@ int action = 0;
 void *_event_loop(void *args) {
     (void) args; // to ignore unused parameter warning
     msg_t msg; // the message to receive
+    int state = 0; // the state used in the animations
 
     printf("Thread is now running. PID: %d. Args: %p\n", thread_getpid(), args);
     while(1) {
@@ -40,7 +41,7 @@ void *_event_loop(void *args) {
                 set_simple_color(rgb);
             break;
             case MOVING_LIGHT:
-                moving_light(rgb, 500000);
+                moving_light(rgb, 500000, state);
             break;
             case HSV_COLOR:
                 hsv_crawling_lights(100);

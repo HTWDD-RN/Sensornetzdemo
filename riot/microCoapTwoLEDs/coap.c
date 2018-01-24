@@ -56,6 +56,11 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
                                 coap_packet_t *outpkt,
                                 uint8_t id_hi, uint8_t id_lo); // pin PA14
 
+static int handle_post_led_animation(coap_rw_buffer_t *scratch,
+                                const coap_packet_t *inpkt,
+                                coap_packet_t *outpkt,
+                                uint8_t id_hi, uint8_t id_lo);
+
 
 static const coap_endpoint_path_t path_well_known_core =
         { 2, { ".well-known", "core" } };
@@ -75,6 +80,9 @@ static const coap_endpoint_path_t path_led0_blink =
 static const coap_endpoint_path_t path_led_strip =
         { 2, { "LED", "strip" } };
 
+static const coap_endpoint_path_t path_led_animation =
+        { 2, { "LED", "animation" } };
+
 const coap_endpoint_t endpoints[] =
 {
     { COAP_METHOD_GET,  handle_get_well_known_core,
@@ -89,6 +97,8 @@ const coap_endpoint_t endpoints[] =
 		    &path_led0_blink,	   "ct=0"  },
     { COAP_METHOD_POST,	handle_post_led_strip,
 		    &path_led_strip,	   "ct=0"  },
+    { COAP_METHOD_POST, handle_post_led_animation,
+        &path_led_animation, "ct=0"  },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };
@@ -181,6 +191,41 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 	return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
 	                          id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
 	                          COAP_CONTENTTYPE_TEXT_PLAIN);
+}
+
+static int handle_post_led_animation(coap_rw_buffer_t *scratch,
+    const coap_packet_t *inpkt, coap_packet_t *outpkt,
+    uint8_t id_hi, uint8_t id_lo)
+{
+    // red by default to indicate parsing error visually
+  int rgb = 0xff0000;
+  const char *input = (const char*)inpkt->payload.p;
+
+  char buffer[20];
+  if (extract_payload(input, buffer)) {
+    printf("Parsed my payload: %s\n", buffer);
+          rgb = parse_payload_rgb(buffer);
+  } else {
+        printf("WARN: Couldn't extract payload (nothing for me?!) [buffer: %s]\n", input);
+    return -1;
+  }
+  
+  // TODO: start animation!
+
+  /* UPDATE thread msg */
+  // _main_msg_queue[0] = action type;
+
+  
+
+ //    char str[12];
+ //    sprintf(str, "%X\0", rgb);
+  // memcpy(response, rgb, sizeof(rgb));
+
+  memcpy(response, "TODO", 4);
+
+  return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
+                            id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                            COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
 static int handle_get_seconds_led0_blink(coap_rw_buffer_t *scratch,

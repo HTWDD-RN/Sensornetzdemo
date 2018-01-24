@@ -41,7 +41,7 @@ void *_event_loop(void *args) {
                 set_simple_color(rgb);
             break;
             case MOVING_LIGHT:
-                moving_light(rgb, 500000, state);
+                moving_light(rgb, 500000, &state);
             break;
             case HSV_COLOR:
                 hsv_crawling_lights(100);

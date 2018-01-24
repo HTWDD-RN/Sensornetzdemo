@@ -459,24 +459,22 @@ function loadResources(hosts, completion) {
 
 function loadResource(hostname, callback) {
   //TODO: add demo node bundling color sequence and image upload functionality
-  resourceService.discover(
-    hostname,
-    function (actions) {
-      const resource = {};
-      resource.id = uuid();
-      resource.name = "Node " + (resources.length + 1).toString();
-      resource.state = "OPEN";
-      resource.ip = hostname;
-      resource.actions = [];
-      for (let action of actions) {
-        const processedAction = processAction(action);
-        if (processedAction != undefined) {
-          resource.actions.push(processedAction);
-        }
+  resourceService.discover(hostname, function (actions) {
+    const resource = {};
+    resource.id = uuid();
+    resource.name = "Node " + (resources.length + 1).toString();
+    resource.state = "OPEN";
+    resource.ip = hostname;
+    resource.actions = [];
+    for (let action of actions) {
+      const processedAction = processAction(action);
+      if (processedAction != undefined) {
+        resource.actions.push(processedAction);
       }
-      resources.push(resource);
-      callback();
-    },
+    }
+    resources.push(resource);
+    callback();
+  },
     function () {
       console.error("Could not load", hostname);
       callback();
@@ -488,18 +486,29 @@ function processAction(rawAction) {
   const action = {};
   action.id = uuid();
   action.actionPath = rawAction.url;
-  action.name =
-    rawAction.name ||
-    action.actionPath
-      .split("/")
-      .join(" ")
-      .trim();
-  if (rawAction.rt == "LED") {
+  action.name = rawAction.name || action.actionPath.split("/").join(" ").trim();
+  if (rawAction.rt == "switch") {
     action.type = "SWITCH";
     const parameter = {};
-    parameter.current = parseInt(rawAction.val);
+    parameter.current = 0;
     parameter.on = 1;
     parameter.off = 0;
+    action.parameter = parameter;
+    return action;
+  } else if (rawAction.rt == "rgb") {
+    action.type = "COLOR_RANGE";
+    const parameter = {};
+    parameter.min = 0x000000;
+    parameter.max = 0xffffff;
+    parameter.current = 0x7f7f7f;
+    action.parameter = parameter;
+    return action;
+  }else if(rawAction.rt == "animation"){
+    action.type = "ANIMATION";
+    const parameter = {};
+    const options = Object.keys(animationTypes);
+    parameter.options = options;
+    parameter.current = options[0];
     action.parameter = parameter;
     return action;
   }

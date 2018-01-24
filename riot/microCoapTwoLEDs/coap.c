@@ -173,9 +173,11 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 
 	//pulsating_light_waves();
 
-    char str[8];
-    sprintf(str, "%X", rgb);
-	memcpy(response, rgb, sizeof(rgb));
+ //    char str[12];
+ //    sprintf(str, "%X\0", rgb);
+	// memcpy(response, rgb, sizeof(rgb));
+
+  memcpy(response, "TODO", 4);
 
 	return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
 	                          id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,

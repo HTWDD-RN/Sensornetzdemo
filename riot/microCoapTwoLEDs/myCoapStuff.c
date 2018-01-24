@@ -122,7 +122,7 @@ unsigned long extract_payload(const char *input, char *output) {
         if (isMyIP(content) != 0) {
             content = strtok_r(NULL, "\n", &hashtagToken);
             strcpy(output, content);
-            output[strlen(content)] = '\0';
+            // output[strlen(content)] = '\0';
             return strlen(content);
         }
         

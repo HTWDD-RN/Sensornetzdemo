@@ -11,6 +11,29 @@ const Color = require("onecolor");
 const BORDER_ROUTER_IP = "2001:db8::585b:2b2f:c1dd:98c6";
 const RESOURCE_IPS = ["2001:db8::585b:1238:1c33:b366", "2001:db8::585a:1f03:382e:891a"];
 
+const animationTypes = {
+  None: {
+    parameter: '',
+    idx: 0
+  },
+  "Set Color": {
+    parameter: '16711680',
+    idx: 1
+  },
+  "Moving Light": {
+    parameter: '65280',
+    idx: 2
+  },
+  "HSV Color": {
+    parameter: '100',
+    idx: 3
+  },
+  "Light Waves": {
+    parameter: '',
+    idx: 4
+  }
+};
+
 const dummyResource = {
   id: "led_a",
   name: "Node A",
@@ -66,7 +89,13 @@ const dummyResource = {
       type: "ANIMATION",
       actionPath: "/LED/animation",
       parameter: {
-        options: ["Wave", "Blabla", "Blabla2", "None"],
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
         current: "None"
       }
     }
@@ -228,7 +257,7 @@ function isValidValue(action, value) {
     const data = value.split("#");
     return data.length == 2 && (data[0] == "true" || data[0] == "false") && !Number.isNaN(parseInt(data[1]));
   } else if (action.type == "ANIMATION") {
-    return action.parameter.options.indexOf(value)!==-1;
+    return action.parameter.options.indexOf(value) !== -1;
   }
 
   console.log("Unknown action", action.type);
@@ -344,8 +373,10 @@ function updateValue(action, value) {
 function getPayload(actionType, value) {
   if (actionType == "SWITCH" || actionType == "RANGE" || actionType == "COLOR_RANGE") {
     return value.toString();
-  }else if(actionType=="ANIMATION"){
-    //TODO: get payload - color + animation type
+  } else if (actionType == "ANIMATION") {
+    const idx = animationTypes[value].idx;
+    const parameter = animationTypes[value].parameter;
+    return idx + "&" + parameter;
   }
   return "";
 }

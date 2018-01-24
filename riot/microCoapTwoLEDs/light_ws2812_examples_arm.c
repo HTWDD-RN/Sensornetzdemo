@@ -26,29 +26,26 @@ void set_simple_color(int rgb)
 }
 
 
-void moving_light(int rgb, int _delay_us)
+void moving_light(int rgb, int _delay_us, int state)
 {
   // moving light dot
-  int i=0;
+  int i=state;
   led[i].r = (rgb & 0xff0000) >> 16;
   led[i].g = (rgb & 0x00ff00) >> 8;
   led[i].b = rgb & 0x0000ff;
 
-  while(1)
+  ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
+  led[i+1] = led[i];
+  led[i].r = 0; led[i].g = 0; led[i].b = 0;
+  i++;
+  xtimer_usleep(_delay_us);
+  if(i == MAXPIX)
   {
-    ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
-    led[i+1] = led[i];
-    led[i].r = 0; led[i].g = 0; led[i].b = 0;
-    i++;
-    xtimer_usleep(_delay_us);
-    if(i == MAXPIX)
-    {
-      i=0;
-      led[MAXPIX-1].r=0; led[MAXPIX-1].g=0; led[MAXPIX-1].b=0;
-      led[i].r = (rgb & 0xff0000) >> 16;
-      led[i].g = (rgb & 0x00ff00) >> 8;
-      led[i].b = rgb & 0x0000ff;
-    }
+    i=0;
+    led[MAXPIX-1].r=0; led[MAXPIX-1].g=0; led[MAXPIX-1].b=0;
+    led[i].r = (rgb & 0xff0000) >> 16;
+    led[i].g = (rgb & 0x00ff00) >> 8;
+    led[i].b = rgb & 0x0000ff;
   }
 }
 

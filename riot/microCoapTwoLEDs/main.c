@@ -23,6 +23,7 @@
 #include "periph/gpio.h"
 #include "include/myCoapStuff.h"
 #include "include/microCoAPServer.h"
+#include "include/light_ws2812_examples_arm.h"
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -60,6 +61,9 @@ int main(void)
 
     /* start thread */
     startThread();
+
+    printf("Turn all lights off intially…\n");
+    set_simple_color(0x000000);
 
     /* start coap server loop */
     microcoap_server_loop();

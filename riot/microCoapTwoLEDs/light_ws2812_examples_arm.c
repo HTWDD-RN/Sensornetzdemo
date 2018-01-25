@@ -4,16 +4,12 @@ struct cRGB led[MAXPIX];
 
 void set_simple_color(int rgb)
 {
-  printf(">>>>>>>>> SETTING COLOR %X\n", rgb);
-
 	// set simple color to pixs
 	if(rgb < 0 || rgb > 0xffffff)
 	{
 		printf("#ERROR: INVALID COLOR FORMAT! GOT (%X), EXPECTED BETWEEN 0x000000 and 0xFFFFFF\n");
 		return;
 	}
-
-  printf(">>>>>>>>> RED:   %d\n>>>>>>>>> GREEN: %d\n>>>>>>>>> BLUE:  %d\n\n", (rgb & 0xff0000) >> 16, (rgb & 0x00ff00) >> 8, rgb & 0x0000ff);
 
 	for(int i= 0; i < MAXPIX; i++)
 	{
@@ -36,12 +32,9 @@ void moving_light(int rgb, int _delay_us, int *state)
   }
 
   ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
-  printf(">>>>>>>>> state: %i\n", *state);
   led[*state+1] = led[*state];
-  printf(">>>>>>>>> state2: %i\n", *state);
   led[*state].r = 0; led[*state].g = 0; led[*state].b = 0;
   *state += 1;
-  printf(">>>>>>>>> state3: %i\n", *state);
   xtimer_usleep(_delay_us);
   if(*state == MAXPIX)
   {

@@ -8,8 +8,8 @@ const uuid = require("uuid/v4");
 const imageProcessor = require("../utils/imageProcessor");
 const Color = require("onecolor");
 
-const BORDER_ROUTER_IP = "2001:db8::585b:2b2f:c1dd:98c6";
-const RESOURCE_IPS = ["2001:db8::585b:1238:1c33:b366", "2001:db8::585a:1f03:382e:891a"];
+const BORDER_ROUTER_IP = "2001:db8::585b:1238:1c33:b366";
+const RESOURCE_IPS = ["2001:db8::585b:2704:6caf:16ba"];
 
 const animationTypes = {
   None: {
@@ -458,7 +458,6 @@ function loadResources(hosts, completion) {
 }
 
 function loadResource(hostname, callback) {
-  //TODO: add demo node bundling color sequence and image upload functionality
   resourceService.discover(hostname, function (actions) {
     const resource = {};
     resource.id = uuid();
@@ -503,7 +502,7 @@ function processAction(rawAction) {
     parameter.current = 0x7f7f7f;
     action.parameter = parameter;
     return action;
-  }else if(rawAction.rt == "animation"){
+  } else if (rawAction.rt == "animation") {
     action.type = "ANIMATION";
     const parameter = {};
     const options = Object.keys(animationTypes);
@@ -532,20 +531,13 @@ exports.start = function (completion) {
   console.log(isDebugMode ? "Debug mode" : "Release mode");
   resources.push(multicastResource);
   resources.push(demoResource);
-  // if (!isDebugMode) {
-  //     loadResources(RESOURCE_IPS, completion);
-  // } else {
-  resources.push(dummyResource);
-  resources.push(dummyResource2);
-  // for (let res of resources) {
-  //     res.ip = "vs0.inf.ethz.ch";
-  //     for (let action of res.actions) {
-  //         action.actionPath = "/large-post";
-  //     }
-  //  }
-  //console.log("Initialized resources to large-post api @ethz.ch");
-  completion();
-  //}
+  if (!isDebugMode) {
+    loadResources(RESOURCE_IPS, completion);
+  } else {
+    resources.push(dummyResource);
+    resources.push(dummyResource2);
+    completion();
+  }
 };
 
 exports.on = function (eventKey, callback) {

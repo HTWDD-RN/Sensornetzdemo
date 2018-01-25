@@ -9,7 +9,7 @@ const imageProcessor = require("../utils/imageProcessor");
 const Color = require("onecolor");
 
 const BORDER_ROUTER_IP = "2001:db8::585b:1238:1c33:b366";
-const RESOURCE_IPS = ["2001:db8::585b:2704:6caf:16ba"];
+const RESOURCE_IPS = ["2001:db8::585a:2704:6caf:16ba"];
 
 const animationTypes = {
   None: {

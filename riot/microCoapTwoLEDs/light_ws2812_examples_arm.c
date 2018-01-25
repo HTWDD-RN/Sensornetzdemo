@@ -34,6 +34,7 @@ void moving_light(int rgb, int _delay_us, int *state)
   ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
   xtimer_usleep(_delay_us);
   *state++;
+  if (*state >= MAXPIX) *state = 0;
 }
 
 /**

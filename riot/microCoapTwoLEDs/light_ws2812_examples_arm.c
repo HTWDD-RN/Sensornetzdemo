@@ -24,26 +24,16 @@ void set_simple_color(int rgb)
 
 void moving_light(int rgb, int _delay_us, int *state)
 {
-  // moving light dot
-  if (*state == 0) {
-    led[*state].r = (rgb & 0xff0000) >> 16;
-    led[*state].g = (rgb & 0x00ff00) >> 8;
-    led[*state].b = rgb & 0x0000ff;
+  for (int i = 0; i < MAXPIX - 1; i++) {
+    int color = i == *state ? rgb : 0x000000;
+    led[i].r = (color & 0xff0000) >> 16;
+    led[i].g = (color & 0x00ff00) >> 8;
+    led[i].b = color & 0x0000ff;
   }
 
   ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
-  led[*state+1] = led[*state];
-  led[*state].r = 0; led[*state].g = 0; led[*state].b = 0;
-  *state += 1;
   xtimer_usleep(_delay_us);
-  if(*state == MAXPIX)
-  {
-    *state = 0;
-    led[MAXPIX-1].r=0; led[MAXPIX-1].g=0; led[MAXPIX-1].b=0;
-    led[*state].r = (rgb & 0xff0000) >> 16;
-    led[*state].g = (rgb & 0x00ff00) >> 8;
-    led[*state].b = rgb & 0x0000ff;
-  }
+  *state++;
 }
 
 /**

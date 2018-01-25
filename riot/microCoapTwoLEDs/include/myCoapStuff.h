@@ -19,9 +19,6 @@
 #include "shell.h"
 #include "thread.h"
 
-#define MAIN_QUEUE_SIZE (8)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
 typedef enum action { 
     NONE = 0,
     SET_COLOR = 1, 

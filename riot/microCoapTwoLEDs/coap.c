@@ -17,12 +17,6 @@
 
 #define MAX_RESPONSE_LEN 500
 
-//#define MAXPIX 6
-//#define COLORLENGTH (MAXPIX/2)
-//#define FADE (8/COLORLENGTH)
-//struct cRGB colors[8];
-//struct cRGB led[MAXPIX];
-
 extern kernel_pid_t animation_pid;
 
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
@@ -178,11 +172,6 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 	}
   
   set_simple_color(rgb);
-
-  /* UPDATE thread msg */
-  // _main_msg_queue[0] = action type;
-
-  
 
  //    char str[12];
  //    sprintf(str, "%X\0", rgb);

@@ -17,18 +17,27 @@ void *_event_loop(void *args) {
     ACTION action = 0;
     int parameter = 0;
 
+    // HSV animation
+    int H = 0;
+    // light waves
+    int direction = 1, pix = 0;
+
     printf("Thread is now running. PID: %d. Args: %p\n", thread_getpid(), args);
     while(1) {
         if (msg_try_receive(&msg) != -1) {
             // message was received
             message_content *content;
             content = (message_content *)msg.content.value;
-            printf(">>> Received: %d\n", content);
+            printf(">>> Received: %i\n", content);
 
             // set action type 
             action = content->action;
             parameter = content->parameter;
-            state = 0; // reset state
+            state = 0;      // reset state
+            /* reset animation parameters */
+            H = 0;          // reset HSV animation
+            direction = 1;  // reset light waves animation
+            pix = 0;        // reset light waves animation
             free(content);
         }
 
@@ -41,10 +50,10 @@ void *_event_loop(void *args) {
                 moving_light(parameter, 500000, &state);
                 break;
             case HSV_COLOR:
-                hsv_crawling_lights(100);
+                hsv_crawling_lights(100, &H, &state);
                 break;
             case LIGHT_WAVES:
-                pulsating_light_waves();
+                pulsating_light_waves(&direction, &pix);
                 break;
             default: 
                 break;

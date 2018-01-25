@@ -16,7 +16,7 @@ void *_animation_loop(void *args) {
 
     int state = 0; // the state used in the animations
 
-    ACTION action = 0;
+    ACTION action = NONE;
     int parameter = 0;
 
     // HSV animation
@@ -31,7 +31,6 @@ void *_animation_loop(void *args) {
             // message was received
             message_content *content;
             content = (message_content *)msg.content.value;
-            printf(">>> Received: %i\n", content);
 
             // set action type 
             action = content->action;
@@ -59,7 +58,7 @@ void *_animation_loop(void *args) {
             case LIGHT_WAVES:
                 pulsating_light_waves(&direction, &pix);
                 break;
-            default: 
+            default:
                 break;
         }
     }

@@ -9,9 +9,11 @@
 
 kernel_pid_t animation_pid = KERNEL_PID_UNDEF;
 
-void *_event_loop(void *args) {
+static char animation_stack[THREAD_STACKSIZE_DEFAULT];
+
+void *_animation_loop(void *args) {
     (void) args; // to ignore unused parameter warning
-    msg_t msg; // the message to receive
+
     int state = 0; // the state used in the animations
 
     ACTION action = 0;
@@ -24,6 +26,7 @@ void *_event_loop(void *args) {
 
     printf("Thread is now running. PID: %d. Args: %p\n", thread_getpid(), args);
     while(1) {
+        msg_t msg; // the message to receive
         if (msg_try_receive(&msg) != -1) {
             // message was received
             message_content *content;
@@ -62,8 +65,8 @@ void *_event_loop(void *args) {
 }
 
 void startThread(void) {
-    animation_pid = thread_create(thread_stack, sizeof(thread_stack), THREAD_PRIORITY_MAIN - 1,
-                      THREAD_CREATE_STACKTEST, _event_loop, NULL, "Eventloop");
+    animation_pid = thread_create(animation_stack, sizeof(animation_stack), THREAD_PRIORITY_MAIN + 1,
+                      THREAD_CREATE_STACKTEST, _animation_loop, NULL, "Eventloop");
 }
 
 void led0_blink(gpio_t led0_pin, int times)

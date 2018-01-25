@@ -24,6 +24,9 @@
 #include "include/myCoapStuff.h"
 #include "include/microCoAPServer.h"
 
+#define MAIN_QUEUE_SIZE     (8)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
 // Per convention, RIOT defines a macro that is assigned the pin number of an
 // on-board LED. If no LED is available, the pin number defaults to 0. For
 // compatibility with the Arduino IDE, we also fall back to pin 0 here, if the
@@ -36,6 +39,8 @@ extern int _netif_config(int argc, char **argv);
 
 int main(void)
 {
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+
     puts("RIOT microcoap example application");
     xtimer_sleep(3);
     led0_blink(LED0_PIN, 3);

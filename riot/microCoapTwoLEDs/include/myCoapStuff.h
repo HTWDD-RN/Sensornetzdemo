@@ -32,8 +32,6 @@ typedef struct {
     int parameter;
 } message_content;
 
-static char thread_stack[THREAD_STACKSIZE_DEFAULT];
-
 void *_event_loop(void *args);
 void startThread(void);
 

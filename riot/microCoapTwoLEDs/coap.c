@@ -189,33 +189,24 @@ static int handle_post_led_animation(coap_rw_buffer_t *scratch,
     uint8_t id_hi, uint8_t id_lo)
 {
     // red by default to indicate parsing error visually
-  int rgb = 0xff0000;
+  int type = SET_COLOR, parameter = 0xff0000;
   const char *input = (const char*)inpkt->payload.p;
 
   char buffer[20];
   if (extract_payload(input, buffer)) {
     printf("Parsed my payload: %s\n", buffer);
-          rgb = parse_payload_rgb(buffer);
+    parse_animation_payload(buffer, &type, &parameter);
   } else {
         printf("WARN: Couldn't extract payload (nothing for me?!) [buffer: %s]\n", input);
     return -1;
   }
-  
-  // TODO: start animation!
-
-  /* UPDATE thread msg */
-  // _main_msg_queue[0] = action type;
 
   message_content *msg_content = malloc(sizeof(message_content));
-  msg_content->action = SET_COLOR;
-  msg_content->parameter = 0xff0000;
+  msg_content->action = type;
+  msg_content->parameter = parameter;
   msg_t msg;
   msg.content.value = (int)msg_content;
   msg_send(&msg, animation_pid);
-
- //    char str[12];
- //    sprintf(str, "%X\0", rgb);
-  // memcpy(response, rgb, sizeof(rgb));
 
   memcpy(response, "TODO", 4);
 

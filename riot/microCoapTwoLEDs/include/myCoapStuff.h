@@ -44,6 +44,7 @@ int set(gpio_t pin);
 int clear(gpio_t pin);
 int toggle(gpio_t pin);
 int parse_payload(const uint8_t *input, size_t size );
+void parse_animation_payload(const char *input, int *type, int *parameter);
 int parse_payload_rgb(const char *input);
 unsigned long extract_payload(const char *input, char *output);
 

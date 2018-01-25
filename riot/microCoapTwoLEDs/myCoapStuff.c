@@ -53,7 +53,7 @@ void *_animation_loop(void *args) {
                 moving_light(parameter, 500000, &state);
                 break;
             case HSV_COLOR:
-                hsv_crawling_lights(100, &H, &state);
+                hsv_crawling_lights(parameter, &H, &state);
                 break;
             case LIGHT_WAVES:
                 pulsating_light_waves(&direction, &pix);
@@ -127,6 +127,17 @@ int parse_payload(const uint8_t *input, size_t size )
         val = val * 10 + input[i] - '0';
 
     return( val );
+}
+
+void parse_animation_payload(const char *input, int *type, int *parameter) {
+    char *copy = strdup(input);
+    char *line;
+    line = strtok(copy, "&");
+    
+    *type = (int)strtol(line, NULL, 10);
+    
+    line = strtok(NULL, "\n");
+    *parameter = (int)strtol(line, NULL, 10);
 }
 
 int parse_payload_rgb(const char *input)

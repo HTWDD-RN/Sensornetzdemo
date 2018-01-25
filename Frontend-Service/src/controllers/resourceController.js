@@ -458,7 +458,9 @@ function loadResources(hosts, completion) {
 }
 
 function loadResource(hostname, callback) {
+  console.log("Loading resources of ", hostname);
   resourceService.discover(hostname, function (actions) {
+    console.log("Got actions of", hostname, JSON.stringify(actions));
     const resource = {};
     resource.id = uuid();
     resource.name = "Node " + (resources.length + 1).toString();

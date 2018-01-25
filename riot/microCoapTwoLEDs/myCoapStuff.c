@@ -42,6 +42,7 @@ void *_animation_loop(void *args) {
             direction = 1;  // reset light waves animation
             pix = 0;        // reset light waves animation
             free(content);
+            set_simple_color(0x000000);
         }
 
         switch(action) // switch for action type

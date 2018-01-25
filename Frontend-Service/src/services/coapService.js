@@ -57,13 +57,11 @@ exports.get = function (host, pathname, success, fail) {
         console.log(err, pathname);
         if (fail && typeof fail == "function") {
             fail(err);
-            process.exit(-1);
         }
     }).on('timeout', (err) => {
         console.log(err, pathname);
         if (fail && typeof fail == "function") {
             fail(err);
-            process.exit(-1);
         }
     }).end();
 };

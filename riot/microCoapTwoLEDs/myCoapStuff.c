@@ -130,14 +130,16 @@ int parse_payload(const uint8_t *input, size_t size )
 }
 
 void parse_animation_payload(const char *input, int *type, int *parameter) {
-    char *copy = strdup(input);
-    char *line;
-    line = strtok(copy, "&");
-    
-    *type = (int)strtol(line, NULL, 10);
-    
-    line = strtok(NULL, "\n");
-    *parameter = (int)strtol(line, NULL, 10);
+	*type = 0; *parameter = 0;
+	char *copy = strdup(input);
+	char *line;
+	line = strtok(copy, "&");
+	if (line == NULL || strlen(line) == 0) return;
+	*type = (int)strtol(line, NULL, 10);
+	
+	line = strtok(NULL, "\n");
+	if (line == NULL || strlen(line) == 0) return;
+	*parameter = (int)strtol(line, NULL, 10);
 }
 
 int parse_payload_rgb(const char *input)
@@ -169,6 +171,7 @@ int isMyIP(char *addr)
             }
         }
     }
+    *output = 0; // if no ip matched, no string should be parsed
     return 0;
 }
 

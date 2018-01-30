@@ -1,40 +1,76 @@
 #include "include/light_ws2812_examples_arm.h"
 
+/* declare struct variable */
 struct cRGB led[MAXPIX];
 
 void set_simple_color(int rgb)
 {
 	// set simple color to pixs
-	if(rgb < 0 || rgb > 0xffffff)
+	if(rgb < 0x000000 || rgb > 0xffffff)
 	{
 		printf("#ERROR: INVALID COLOR FORMAT! GOT (%X), EXPECTED BETWEEN 0x000000 and 0xFFFFFF\n");
 		return;
 	}
-
+  //printf("rgb value [%i] MAXPIX %i\n", rgb, MAXPIX);
 	for(int i= 0; i < MAXPIX; i++)
 	{
 		led[i].r = (rgb & 0xff0000) >> 16;
 		led[i].g = (rgb & 0x00ff00) >> 8;
 		led[i].b = rgb & 0x0000ff;
+    //printf("r[%i] g[%i] b[%i]\n", led[i].r, led[i].g, led[i].b);
 	}
 
 	ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
+  xtimer_usleep(10000);
 }
 
 
+/*void moving_light(int rgb, int _delay_us, int *state)
+{
+  if(rgb < 0x000000 || rgb > 0xffffff)
+  {
+    printf("#ERROR: INVALID COLOR FORMAT! GOT (%X), EXPECTED BETWEEN 0x000000 and 0xFFFFFF\n");
+    return;
+  }
+  
+  // moving light dot
+  if (*state == 0) {
+    led[*state].r = (rgb & 0xff0000) >> 16;
+    led[*state].g = (rgb & 0x00ff00) >> 8;
+    led[*state].b = rgb & 0x0000ff;
+  }
+
+  //printf("state value [%i]\n", *state);
+
+  ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
+  led[*state+1] = led[*state];
+  led[*state].r = 0; led[*state].g = 0; led[*state].b = 0;
+  *state += 1;
+  xtimer_usleep(_delay_us);
+  if(*state == MAXPIX)
+  {
+    *state = 0;
+    led[MAXPIX-1].r=0; led[MAXPIX-1].g=0; led[MAXPIX-1].b=0;
+    led[*state].r = (rgb & 0xff0000) >> 16;
+    led[*state].g = (rgb & 0x00ff00) >> 8;
+    led[*state].b = rgb & 0x0000ff;
+  }
+}*/
+
 void moving_light(int rgb, int _delay_us, int *state)
 {
-  for (int i = 0; i < MAXPIX - 1; i++) {
+  for (int i = 0; i < MAXPIX; i++) {
     int color = i == *state ? rgb : 0x000000;
     led[i].r = (color & 0xff0000) >> 16;
     led[i].g = (color & 0x00ff00) >> 8;
     led[i].b = color & 0x0000ff;
+    //printf("r[%i] g[%i] b[%i]\n", led[i].r, led[i].g, led[i].b);
   }
+  //printf("\n");
 
   ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
   xtimer_usleep(_delay_us);
-  *state++;
-  if (*state >= MAXPIX) *state = 0;
+  *state = (*state == MAXPIX-1) ? 0 : *state + 1;
 }
 
 /**
@@ -42,18 +78,18 @@ void moving_light(int rgb, int _delay_us, int *state)
  */
 void hsv_crawling_lights(int intensity, int *H, int *state)
 {
-  if (*state == 0) {
-    if(intensity > 100)
-    {
-    	intensity = 100;
-    	printf("Intensity value [%i] too high! Set to 100\n", intensity);
-    }
-    if(intensity < 0)
-    {
-    	intensity=0;
-  	printf("Intensity value [%i] too low! Set to 0\n", intensity);
-    }
+  if(intensity > 100)
+  {
+    intensity = 100;
+    printf("Intensity value [%i] too high! Set to 100\n", intensity);
+  }
+  if(intensity < 0)
+  {
+    intensity=0;
+    printf("Intensity value [%i] too low! Set to 0\n", intensity);
+  }
 
+  if (*state == 0) {
     intensity *= 2.55;
     *state = 1;
   }
@@ -87,7 +123,7 @@ void hsv_crawling_lights(int intensity, int *H, int *state)
   }
 
   ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
-  xtimer_usleep(5000);
+  xtimer_usleep(10000);
 }
 
 /**
@@ -110,14 +146,13 @@ int scale(float val)
 
 void pulsating_light_waves(int *direction, int *pix)
 {
-
   *pix += 1;
 
   if(*pix >= MAXPIX*13*15)
     *pix = 0;
 
   int j = 0, offset = map2PI(*pix);
-  float rsin, gsin, bsin;
+  float rsin = 0, gsin = 0, bsin = 0;
 
   if ((rand()/(float)RAND_MAX) > .995)
     *direction *= -1; // All skate, reverse direction!

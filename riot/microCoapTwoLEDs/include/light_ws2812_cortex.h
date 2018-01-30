@@ -117,8 +117,7 @@
 // Numer of bytes to be transmitted is leds*3
 ///////////////////////////////////////////////////////////////////////
 
-struct cRGB  { uint8_t g; uint8_t r; uint8_t b; };
-struct cRGBw  { uint8_t g; uint8_t r; uint8_t b; uint8_t w; };
+struct cRGB { uint8_t g; uint8_t r; uint8_t b; };
 
 void ws2812_sendarray(uint8_t *ledarray,int length);
 

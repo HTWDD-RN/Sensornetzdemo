@@ -400,13 +400,17 @@ exports.update_resource = function (req, res) {
           updateValue(action, value);
         } else {
           //actions that are sent directly to the node
+          if (action.type == "COLOR_RANGE") {
+            for (let singleAction of resourceService.actions) {
+              if (singleAction.type == "ANIMATION" && singleAction.parameter.current != "None") {
+                resourceService.setState(BORDER_ROUTER_IP, resource.ip,
+                  singleAction.actionPath, getPayload(singleAction.type, "None"));
+              }
+            }
+          }
           console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://" + resource.ip + action.actionPath);
-          resourceService.setState(
-            BORDER_ROUTER_IP,
-            resource.ip,
-            action.actionPath,
-            getPayload(action.type, value),
-            data => { },
+          resourceService.setState(BORDER_ROUTER_IP, resource.ip,
+            action.actionPath, getPayload(action.type, value), data => { },
             console.log.bind(this, "Could not update state.")
           );
           updateValue(action, value);

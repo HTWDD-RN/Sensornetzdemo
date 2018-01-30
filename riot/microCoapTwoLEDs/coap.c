@@ -171,11 +171,12 @@ static int handle_post_led_strip(coap_rw_buffer_t *scratch,
 		return -1;
 	}
   
-  set_simple_color(rgb);
-
- //    char str[12];
- //    sprintf(str, "%X\0", rgb);
-	// memcpy(response, rgb, sizeof(rgb));
+  message_content *msg_content = malloc(sizeof(message_content));
+  msg_content->action = SET_COLOR;
+  msg_content->parameter = rgb;
+  msg_t msg;
+  msg.content.value = (int)msg_content;
+  msg_send(&msg, animation_pid);
 
   memcpy(response, "TODO", 4);
 

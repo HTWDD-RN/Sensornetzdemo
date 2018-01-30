@@ -171,7 +171,6 @@ int isMyIP(char *addr)
             }
         }
     }
-    *output = 0; // if no ip matched, no string should be parsed
     return 0;
 }
 
@@ -204,6 +203,7 @@ unsigned long extract_payload(const char *input, char *output) {
         
         line = strtok_r(NULL, "\n", &lineToken);
     }
+    *output = 0; // if no ip matched, no string should be parsed
     return 0;
 }
 

@@ -322,13 +322,7 @@ function updateValue(action, value) {
             propagate += percentagePerNode;
           }
           eventEmitter.emit("update", resources);
-          resourceService.multicast(
-            BORDER_ROUTER_IP,
-            rgbActions[0].actionPath,
-            parameter,
-            console.log,
-            console.log
-          );
+          resourceService.multicast(BORDER_ROUTER_IP, rgbActions[0].actionPath, parameter, console.log, console.log);
         }.bind(this, action.id)
       );
     });
@@ -406,15 +400,7 @@ exports.update_resource = function (req, res) {
           updateValue(action, value);
         } else {
           //actions that are sent directly to the node
-          console.log(
-            "Upgrading action",
-            action.name,
-            "of",
-            resource.name,
-            "to",
-            value,
-            ": coap://" + resource.ip + action.actionPath
-          );
+          console.log("Upgrading action", action.name, "of", resource.name, "to", value, ": coap://" + resource.ip + action.actionPath);
           resourceService.setState(
             BORDER_ROUTER_IP,
             resource.ip,
@@ -460,7 +446,6 @@ function loadResources(hosts, completion) {
 function loadResource(hostname, callback) {
   console.log("Loading resources of ", hostname);
   resourceService.discover(hostname, function (contentType, actions) {
-    console.log("Got actions of", hostname, JSON.stringify(actions));
     const resource = {};
     resource.id = uuid();
     resource.name = "Node " + (resources.length + 1).toString();
@@ -474,6 +459,7 @@ function loadResource(hostname, callback) {
       }
     }
     resources.push(resource);
+    console.log("Loaded", resource.actions.length, "actions of", hostname);
     callback();
   },
     function () {
@@ -487,7 +473,6 @@ function processAction(rawAction) {
   const action = {};
   action.id = uuid();
   action.actionPath = rawAction.url;
-  console.log(action.id, action.actionPath, rawAction);
   action.name = rawAction.name || action.actionPath.split("/").join(" ").trim();
   if (rawAction.rt == "switch") {
     action.type = "SWITCH";

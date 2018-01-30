@@ -6,15 +6,12 @@ const parseLinkFormat = require("../utils/linkFormatParser").parse;
 /* Helpers */
 
 const processPayload = function (payload, contentFormat) {
-    console.log()
     const strPayload = stringifyBuffer(payload).binary;
     const type = contentFormat == "application/link-format" || contentFormat == "application/json" ? "json" : "plain";
     var data = strPayload;
     if (contentFormat == "application/link-format") {
-        console.log("Parsing link format");
         data = parseLinkFormat(data);
     } else if (contentFormat == "application/json") {
-        console.log("Parsing json");
         try {
             data = JSON.parse(strPayload);
         } catch (e) {

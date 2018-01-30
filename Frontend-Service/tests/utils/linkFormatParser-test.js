@@ -16,5 +16,7 @@ describe('LinkFormatParser', function () {
         expect(second.val).to.equal('1');
         expect(second.name).to.equal('MyLovelyLED');
         expect(second.node).to.equal('PrimarkBillboard');
+        const res2 = Parser.parse("</.well-known/core>;ct=40,</riot/board>;ct=0,</LED/red>;ct=0;rt=switch,</LED/green>;ct=0;rt=switch,</htw/led0>;ct=0,</LED/strip>;ct=0;rt=rgb,</LED/animation>;ct=0;rt=animation");
+        console.log(JSON.stringify(res2));
     });
 });

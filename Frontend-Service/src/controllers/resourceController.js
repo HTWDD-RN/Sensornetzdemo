@@ -459,7 +459,7 @@ function loadResources(hosts, completion) {
 
 function loadResource(hostname, callback) {
   console.log("Loading resources of ", hostname);
-  resourceService.discover(hostname, function (actions) {
+  resourceService.discover(hostname, function (contentType, actions) {
     console.log("Got actions of", hostname, JSON.stringify(actions));
     const resource = {};
     resource.id = uuid();
@@ -487,6 +487,7 @@ function processAction(rawAction) {
   const action = {};
   action.id = uuid();
   action.actionPath = rawAction.url;
+  console.log(action.id, action.actionPath, rawAction);
   action.name = rawAction.name || action.actionPath.split("/").join(" ").trim();
   if (rawAction.rt == "switch") {
     action.type = "SWITCH";

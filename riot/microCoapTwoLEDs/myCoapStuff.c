@@ -23,25 +23,18 @@ void *_animation_loop(void *args) {
     int H = 0;
     // light waves
     int direction = 1, pix = 0;
-
-    /* ****** */
-    //msg_t msg.cotnent.value = 0; // the message to receive
-    /* ****** */
      
     printf("Thread is now running. PID: %d. Args: %p\n", thread_getpid(), args);
     
-    //action = MOVING_LIGHT;
-    //parameter = 0xff0000;
-
     while(1) {
-        /* ****** */
-        msg_t msg; //msg.cotnent.value = 0;
-        /* ****** */
+        msg_t msg;
+
+        // if incoming message was received
         if (msg_try_receive(&msg) != -1) {
-            // message was received
+            
             message_content *content;
             content = (message_content *)msg.content.value;
-            printf(">>> Received: %i\n", content);
+            printf("");
 
             // set action type 
             action = content->action;
@@ -58,7 +51,6 @@ void *_animation_loop(void *args) {
         switch(action) // switch for action type
         {
             case SET_COLOR:
-                //printf(">>>>>>>>>>>>>> IN SET_COLOT action %i\n", action);
                 set_simple_color(parameter);
                 break;
             case MOVING_LIGHT:
@@ -70,7 +62,7 @@ void *_animation_loop(void *args) {
             case LIGHT_WAVES:
                 pulsating_light_waves(&direction, &pix);
                 break;
-            default: 
+            default:
                 break;
         }
     }

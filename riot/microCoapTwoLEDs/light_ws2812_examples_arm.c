@@ -6,12 +6,12 @@ struct cRGB led[MAXPIX];
 void set_simple_color(int rgb)
 {
 	// set simple color to pixs
-	if(rgb < 0x000000 || rgb > 0xffffff)
+	if(rgb < 0 || rgb > 0xffffff)
 	{
 		printf("#ERROR: INVALID COLOR FORMAT! GOT (%X), EXPECTED BETWEEN 0x000000 and 0xFFFFFF\n");
 		return;
 	}
-  //printf("rgb value [%i] MAXPIX %i\n", rgb, MAXPIX);
+  
 	for(int i= 0; i < MAXPIX; i++)
 	{
 		led[i].r = (rgb & 0xff0000) >> 16;
@@ -24,39 +24,9 @@ void set_simple_color(int rgb)
   xtimer_usleep(10000);
 }
 
-
-/*void moving_light(int rgb, int _delay_us, int *state)
-{
-  if(rgb < 0x000000 || rgb > 0xffffff)
-  {
-    printf("#ERROR: INVALID COLOR FORMAT! GOT (%X), EXPECTED BETWEEN 0x000000 and 0xFFFFFF\n");
-    return;
-  }
-  
-  // moving light dot
-  if (*state == 0) {
-    led[*state].r = (rgb & 0xff0000) >> 16;
-    led[*state].g = (rgb & 0x00ff00) >> 8;
-    led[*state].b = rgb & 0x0000ff;
-  }
-
-  //printf("state value [%i]\n", *state);
-
-  ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
-  led[*state+1] = led[*state];
-  led[*state].r = 0; led[*state].g = 0; led[*state].b = 0;
-  *state += 1;
-  xtimer_usleep(_delay_us);
-  if(*state == MAXPIX)
-  {
-    *state = 0;
-    led[MAXPIX-1].r=0; led[MAXPIX-1].g=0; led[MAXPIX-1].b=0;
-    led[*state].r = (rgb & 0xff0000) >> 16;
-    led[*state].g = (rgb & 0x00ff00) >> 8;
-    led[*state].b = rgb & 0x0000ff;
-  }
-}*/
-
+/**
+ * moving light animation
+ */
 void moving_light(int rgb, int _delay_us, int *state)
 {
   for (int i = 0; i < MAXPIX; i++) {
@@ -64,9 +34,7 @@ void moving_light(int rgb, int _delay_us, int *state)
     led[i].r = (color & 0xff0000) >> 16;
     led[i].g = (color & 0x00ff00) >> 8;
     led[i].b = color & 0x0000ff;
-    //printf("r[%i] g[%i] b[%i]\n", led[i].r, led[i].g, led[i].b);
   }
-  //printf("\n");
 
   ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
   xtimer_usleep(_delay_us);
@@ -173,7 +141,6 @@ void pulsating_light_waves(int *direction, int *pix)
     gsin = sin(2 * j / 13 + map2PI(MAXPIX / 6)); // sin(2/3 t + 1/3 PI)
     bsin = sin(4 * j / 15 + map2PI(MAXPIX / 3)); // sin(4/5 t + 2/3 PI)
 
-    //this.ledstrip.buffer[i] = [this.scale(rsin), this.scale(gsin), this.scale(bsin)];
     led[i].r = scale(rsin);
     led[i].g = scale(gsin);
     led[i].b = scale(bsin);

@@ -36,20 +36,8 @@ void ws2812_sendarray(uint8_t *data,int datlen)
 	volatile uint32_t *clr = ws2812_port_clr;
 	uint32_t i = 0;
 	uint32_t curbyte;
-	int len = datlen;
 
-	//printf(">>>>>>>>>>> curbyte %i\n", curbyte);
-	//printf(">>>>>>>>>>> *data %i\n", *data);
-	//printf(">>>>>>>>>>> len %i\n", len);
-	//printf(">>>>>>>>>>> *data %i\n", *data);
-	  /*for (int i = 0; i < MAXPIX; i++) {
-	    printf("r[%i] g[%i] b[%i]\n", data[i].r, data[i].g, data[i].b);
-	  }
-	  printf("\n");*/
-
-	while (len--) {
-		//printf(">>>>>>>>>>> *data %i\n", *data);
-		//printf(">>>>>>>>>>> curbyte %d\n", curbyte);
+	while (datlen--) {
 		curbyte=*data++;
 
 	asm volatile(

@@ -8,7 +8,7 @@ const uuid = require("uuid/v4");
 const imageProcessor = require("../utils/imageProcessor");
 const Color = require("onecolor");
 
-const BORDER_ROUTER_IP = "2001:db8::585b:1238:1c33:b366";
+const BORDER_ROUTER_IP = "2001:db8::5855:1277:fb88:4f1e";
 const RESOURCE_IPS = ["2001:db8::585a:2704:6caf:16ba"];
 
 const animationTypes = {
@@ -101,6 +101,259 @@ const dummyResource = {
     }
   ]
 };
+
+const r1 = {
+  id: "led_1",
+  name: "NODE A",
+  state: "OPEN",
+  ip: "fe80::585b:2c75:46f8:9fbe",
+  actions: [
+    {
+      id: "led_1_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    },
+    {
+      id: "led_1_2",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
+        current: "None"
+      }
+    }
+  ]
+};
+
+const r2 = {
+  id: "led_1",
+  name: "NODE B",
+  state: "OPEN",
+  ip: "fe80::585f:1b3c:ad00:1726",
+  actions: [
+    {
+      id: "led_2_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    },
+    {
+      id: "led_2_2",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
+        current: "None"
+      }
+    }
+  ]
+};
+
+const r3 = {
+  id: "led_3",
+  name: "NODE C",
+  state: "OPEN",
+  ip: "fe80::585b:2819:6ba4:50b2",
+  actions: [
+    {
+      id: "led_3_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    },
+    {
+      id: "led_3_2",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
+        current: "None"
+      }
+    }
+  ]
+};
+
+const r4 = {
+  id: "led_4",
+  name: "NODE D",
+  state: "OPEN",
+  ip: "fe80::585a:1f03:382e:891a",
+  actions: [
+    {
+      id: "led_4_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    },
+    {
+      id: "led_4_2",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
+        current: "None"
+      }
+    }
+  ]
+};
+
+const r5 = {
+  id: "led_5",
+  name: "NODE E",
+  state: "OPEN",
+  ip: "fe80::585b:1801:4b51:d932",
+  actions: [
+    {
+      id: "led_5_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    },
+    {
+      id: "led_5_2",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
+        current: "None"
+      }
+    }
+  ]
+};
+
+const r6 = {
+  id: "led_6",
+  name: "NODE F",
+  state: "OPEN",
+  ip: "fe80::585a:2704:6caf:16ba",
+  actions: [
+    {
+      id: "led_6_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    },
+    {
+      id: "led_6_2",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
+        current: "None"
+      }
+    }
+  ]
+};
+
+const r7 = {
+  id: "led_7",
+  name: "NODE G",
+  state: "OPEN",
+  ip: "fe80::585b:1238:1c33:b366",
+  actions: [
+    {
+      id: "led_7_1",
+      name: "RGB",
+      type: "COLOR_RANGE",
+      actionPath: "/LED/strip",
+      parameter: {
+        min: 0x000000,
+        max: 0xffffff,
+        current: 0x7f7f7f
+      }
+    },
+    {
+      id: "led_7_2",
+      name: "Animation",
+      type: "ANIMATION",
+      actionPath: "/LED/animation",
+      parameter: {
+        options: [
+          "None",//no parameter
+          "Set Color", //decimal color parameter
+          "Moving Light", //decimal color parameter
+          "HSV Color", //intensity (0-100)
+          "Light Waves" //no parameter
+        ],
+        current: "None"
+      }
+    }
+  ]
+};
+
 const dummyResource2 = {
   id: "led_b",
   name: "Node B",
@@ -113,9 +366,7 @@ const dummyResource2 = {
       type: "COLOR_RANGE",
       actionPath: "/LED/strip",
       parameter: {
-        min: 0x000000,
-        max: 0xffffff,
-        current: 0x7f7f7f
+
       }
     }
   ]
@@ -523,13 +774,20 @@ exports.start = function (completion) {
   console.log(isDebugMode ? "Debug mode" : "Release mode");
   resources.push(multicastResource);
   resources.push(demoResource);
-  if (!isDebugMode) {
-    loadResources(RESOURCE_IPS, completion);
-  } else {
-    resources.push(dummyResource);
-    resources.push(dummyResource2);
-    completion();
-  }
+  resources.push(r1);
+  resources.push(r2);
+  resources.push(r3);
+  resources.push(r4);
+  resources.push(r5);
+  resources.push(r6);
+  resources.push(r7);
+  /*  if (!isDebugMode) {
+      loadResources(RESOURCE_IPS, completion);
+    } else {
+      resources.push(dummyResource);
+      resources.push(dummyResource2);
+      completion();
+    }*/
 };
 
 exports.on = function (eventKey, callback) {

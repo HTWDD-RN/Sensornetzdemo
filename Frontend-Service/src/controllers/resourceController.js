@@ -652,7 +652,7 @@ exports.update_resource = function (req, res) {
         } else {
           //actions that are sent directly to the node
           if (action.type == "COLOR_RANGE") {
-            for (let singleAction of resourceService.actions) {
+            for (let singleAction of resource.actions) {
               if (singleAction.type == "ANIMATION" && singleAction.parameter.current != "None") {
                 resourceService.setState(BORDER_ROUTER_IP, resource.ip,
                   singleAction.actionPath, getPayload(singleAction.type, "None"));

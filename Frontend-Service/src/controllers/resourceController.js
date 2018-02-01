@@ -788,6 +788,7 @@ exports.start = function (completion) {
       resources.push(dummyResource2);
       completion();
     }*/
+    completion();
 };
 
 exports.on = function (eventKey, callback) {

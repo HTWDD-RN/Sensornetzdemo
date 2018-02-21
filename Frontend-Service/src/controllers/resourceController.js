@@ -8,9 +8,11 @@ const uuid = require("uuid/v4");
 const imageProcessor = require("../utils/imageProcessor");
 const Color = require("onecolor");
 
+/* Resources and border router */
 const BORDER_ROUTER_IP = "2001:db8::5855:1277:fb88:4f1e";
 const RESOURCE_IPS = ["2001:db8::585a:2704:6caf:16ba"];
 
+/* Animation mapping */
 const animationTypes = {
   None: {
     parameter: '',
@@ -34,45 +36,13 @@ const animationTypes = {
   }
 };
 
+/* Static resources */
 const dummyResource = {
   id: "led_a",
   name: "Node A",
   state: "OPEN",
   ip: "2001:db8::585a:1f03:382e:891a",
   actions: [
-    // {
-    //   id: "led_a_1",
-    //   name: "Grüne LED",
-    //   type: "SWITCH",
-    //   actionPath: "/LED/green",
-    //   parameter: {
-    //     current: 0,
-    //     on: 1,
-    //     off: 0
-    //   }
-    // },
-    // {
-    //   id: "led_a_2",
-    //   name: "Rote LED",
-    //   type: "SWITCH",
-    //   actionPath: "/LED/red",
-    //   parameter: {
-    //     current: 0,
-    //     on: 1,
-    //     off: 0
-    //   }
-    // },
-    // {
-    //   id: "led_a_3",
-    //   name: "Dimmer",
-    //   type: "RANGE",
-    //   actionPath: "/DIMMER",
-    //   parameter: {
-    //     current: 127,
-    //     min: 0,
-    //     max: 255
-    //   }
-    // },
     {
       id: "led_a_4",
       name: "RGB",
@@ -405,15 +375,6 @@ const demoResource = {
         base64: ""
       }
     },
-    // {
-    //   id: "demo_resource_color_sequence_unicast",
-    //   name: "Color Sequence - Unicast",
-    //   type: "COLOR_SEQUENCE_UNICAST",
-    //   parameter: {
-    //     color: 0x7f7f7f,
-    //     isRunning: false
-    //   }
-    // },
     {
       id: "demo_resource_color_sequence_multicast",
       name: "Color Sequence - Multicast",
@@ -428,6 +389,12 @@ const demoResource = {
 
 const resources = [];
 
+/**
+ * Find resource by given id.
+ * 
+ * @param {string} id the resource id
+ * @returns resource object if found, null otherwise
+ */
 const findResourceById = function (id) {
   for (var i = 0; i < resources.length; i++) {
     const resource = resources[i];
@@ -438,6 +405,12 @@ const findResourceById = function (id) {
   return null;
 };
 
+/**
+ * Get IP Address of action parent node.
+ * 
+ * @param {string} id the action id
+ * @returns ip address if found, null otherwise
+ */
 const getIpByActionId = function (id) {
   for (let resource of resources) {
     for (let action of resource.actions) {
@@ -449,6 +422,12 @@ const getIpByActionId = function (id) {
   return null;
 };
 
+/**
+ * Find action by given id.
+ * 
+ * @param {string} id the action id
+ * @returns action object if found, null otherwise
+ */
 const findActionById = function (id) {
   for (let resource of resources) {
     for (let action of resource.actions) {
@@ -460,6 +439,12 @@ const findActionById = function (id) {
   return null;
 };
 
+/**
+ * Get all actions by given type.
+ * 
+ * @param {string} type the type 
+ * @returns array of actions
+ */
 const findActionsByType = function (type) {
   const result = [];
   for (let resource of resources) {
@@ -472,15 +457,33 @@ const findActionsByType = function (type) {
   return result;
 };
 
+/**
+ * Send resource not found response.
+ * 
+ * @param {*} res 
+ * @param {*} id 
+ */
 const sendResourceNotFoundResponse = function (res, id) {
   res.status(400).send({ message: "Resource " + id + " not found" });
 };
 
+/**
+ * Send response providing all resources.
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.get_resources = function (req, res) {
   const response = { response: resources };
   res.json(response);
 };
 
+/**
+ * Find action by resourceId request parameter and respond with resource data.
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.get_resource = function (req, res) {
   const id = req.params.resourceId;
   const resource = findResourceById(id);
@@ -491,6 +494,13 @@ exports.get_resource = function (req, res) {
   }
 };
 
+/**
+ * Validate whether PUT payload (value to be set) is valid for given action.
+ * 
+ * @param {object} action the action
+ * @param {object} value the payload value
+ * @returns boolean
+ */
 function isValidValue(action, value) {
   if (action.type == "SWITCH") {
     const val = parseInt(value);
@@ -515,6 +525,12 @@ function isValidValue(action, value) {
   return false;
 }
 
+/**
+ * Update current status of an action.
+ * 
+ * @param {object} action the action to update
+ * @param {object} value  the value to set
+ */
 function updateValue(action, value) {
   if (action.type == "SWITCH") {
     action.parameter.current = parseInt(value);
@@ -615,6 +631,13 @@ function updateValue(action, value) {
   }
 }
 
+/**
+ * Get payload to be sent to an endpoint (node).
+ * 
+ * @param {string} actionType the action type 
+ * @param {*} value the value to set
+ * @returns payload to send
+ */
 function getPayload(actionType, value) {
   if (actionType == "SWITCH" || actionType == "RANGE" || actionType == "COLOR_RANGE") {
     return value.toString();
@@ -626,6 +649,12 @@ function getPayload(actionType, value) {
   return "";
 }
 
+/**
+ * Handle PUT requests - validate payload, update action state and send response to the client. 
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.update_resource = function (req, res) {
   const resourceId = req.params.resourceId;
   const actionId = req.params.actionId;
@@ -685,7 +714,8 @@ exports.update_resource = function (req, res) {
 };
 
 /**
- *
+ * Load resources and actions.
+ * 
  * @param {... String} hosts - array of host ips
  * @param {Function} completion
  *
@@ -698,6 +728,12 @@ function loadResources(hosts, completion) {
   loadResource(hosts[0], loadResources.bind(this, hosts.slice(1), completion));
 }
 
+/**
+ * Load and parse single resource.
+ * 
+ * @param {string} hostname the ip address of host
+ * @param {function} callback the callback to call after request was completed
+ */
 function loadResource(hostname, callback) {
   console.log("Loading resources of ", hostname);
   resourceService.discover(hostname, function (contentType, actions) {
@@ -724,6 +760,11 @@ function loadResource(hostname, callback) {
   );
 }
 
+/**
+ * Transform raw action according to project (API) data specification.
+ * 
+ * @param {object} rawAction the action as provided by /.well-known/core
+ */
 function processAction(rawAction) {
   const action = {};
   action.id = uuid();
@@ -788,7 +829,7 @@ exports.start = function (completion) {
       resources.push(dummyResource2);
       completion();
     }*/
-    completion();
+  completion();
 };
 
 exports.on = function (eventKey, callback) {

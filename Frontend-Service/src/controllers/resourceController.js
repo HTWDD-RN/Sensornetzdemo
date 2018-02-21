@@ -799,6 +799,11 @@ function processAction(rawAction) {
   return undefined;
 }
 
+/**
+ * Initialize the controller - load resources.
+ * 
+ * @param {function} completion callback to call after resource controller has been initialized 
+ */
 exports.start = function (completion) {
   let objs = [];
   for (let res of resources) {
@@ -832,6 +837,12 @@ exports.start = function (completion) {
   completion();
 };
 
+/**
+ * Register an event listener.
+ * 
+ * @param {string} eventKey
+ * @param {function} callback 
+ */
 exports.on = function (eventKey, callback) {
   eventEmitter.on(eventKey, callback);
 };

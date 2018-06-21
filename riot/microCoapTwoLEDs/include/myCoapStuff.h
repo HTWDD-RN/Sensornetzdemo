@@ -19,17 +19,21 @@
 #include "shell.h"
 #include "thread.h"
 
+#include "light_ws2812_examples_arm.h"
+
 typedef enum action { 
     NONE = 0,
     SET_COLOR = 1, 
     MOVING_LIGHT = 2, 
     HSV_COLOR = 3, 
-    LIGHT_WAVES = 4
+    LIGHT_WAVES = 4,
+    FFT = 5
 } ACTION;
 
 typedef struct {
     ACTION action;
     int parameter;
+    int parameters[MAXPIX];
 } message_content;
 
 void *_event_loop(void *args);
@@ -44,6 +48,7 @@ int set(gpio_t pin);
 int clear(gpio_t pin);
 int toggle(gpio_t pin);
 int parse_payload(const uint8_t *input, size_t size );
+void parse_payload_fft(const char *input, int *type, int *parameters);
 void parse_animation_payload(const char *input, int *type, int *parameter);
 int parse_payload_rgb(const char *input);
 unsigned long extract_payload(const char *input, char *output);

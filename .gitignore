@@ -13,6 +13,10 @@
 /Frontend-Service/static/img/*.jpg
 /Frontend-Service/static/img/*.png
 
+#BackendSocketIO
+/BackendSocketIO/node_modules
+
+
 # misc
 .DS_Store
 .env.local

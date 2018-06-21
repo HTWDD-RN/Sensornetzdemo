@@ -57,6 +57,11 @@ static int handle_post_led_animation(coap_rw_buffer_t *scratch,
                                 coap_packet_t *outpkt,
                                 uint8_t id_hi, uint8_t id_lo);
 
+static int handle_post_led_fft(coap_rw_buffer_t *scratch,
+                                const coap_packet_t *inpkt,
+                                coap_packet_t *outpkt,
+                                uint8_t id_hi, uint8_t id_lo);
+
 
 static const coap_endpoint_path_t path_well_known_core =
         { 2, { ".well-known", "core" } };
@@ -79,6 +84,9 @@ static const coap_endpoint_path_t path_led_strip =
 static const coap_endpoint_path_t path_led_animation =
         { 2, { "LED", "animation" } };
 
+static const coap_endpoint_path_t path_led_fft =
+        { 2, { "LED", "fft" } };
+
 const coap_endpoint_t endpoints[] =
 {
     { COAP_METHOD_GET,  handle_get_well_known_core,
@@ -95,6 +103,8 @@ const coap_endpoint_t endpoints[] =
 		    &path_led_strip,	   "ct=0;rt=rgb"  },
     { COAP_METHOD_POST, handle_post_led_animation,
         &path_led_animation, "ct=0;rt=animation"  },
+    { COAP_METHOD_POST, handle_post_led_fft,
+        &path_led_fft, "ct=0;rt=fft"  },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };
@@ -210,6 +220,81 @@ static int handle_post_led_animation(coap_rw_buffer_t *scratch,
   msg_send(&msg, animation_pid);
 
   memcpy(response, "TODO", 4);
+
+  return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
+                            id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                            COAP_CONTENTTYPE_TEXT_PLAIN);
+}
+
+static int handle_post_led_fft(coap_rw_buffer_t *scratch,
+    const coap_packet_t *inpkt, coap_packet_t *outpkt,
+    uint8_t id_hi, uint8_t id_lo)
+{
+
+  int parameters[MAXPIX];
+  for(int i=0; i<MAXPIX; i++)
+  {
+    parameters[i] = 0xff0000;
+    printf("parameters %i\n", parameters[i]);
+  }
+
+  int type = FFT;
+
+
+  /*const char *input = (const char*)inpkt->payload.p; 
+  // input-example: ip-address + type + color (hex-code) + ; + \n
+
+  char buffer[MAXPIX*6+1+1+5]; // PIX Color + type + ; + \n
+
+
+  if (extract_payload(input, buffer)) {
+    printf("Parsed my payload: %s\n", buffer);
+
+    printf("strlen(buffer): %i\n", strlen(buffer));    
+
+    if(((strlen(buffer)-2)%6) == 0) // buffer-example: type (5) and color (hex) -> 5FFFFFFAB536A9BD399AB536A;
+      parse_payload_fft(buffer, &type, &parameters);
+
+    // if(type != 5)
+    //   type = 5;
+    // if((sizeof(parameters)/sizeof(parameters[0])) != MAXPIX)
+    //   for(int i=0;i<MAXPIX;i++)
+    //     parameters[i] = 0;
+
+    printf("<>>>>>>> actionType %i\n", type);
+    //for(int i=0; i<MAXPIX;i++)
+    //  printf("parameters %i\n", parameters[i]);
+
+    message_content *msg_content = malloc(sizeof(message_content));
+    msg_content->action = type;
+    for(int i=0;i<MAXPIX;i++)
+    {
+      msg_content->parameters[i] = parameters[i];
+      printf(">>>>>>>>>>> msg_content param %i\n", msg_content->parameters[i]);
+    }
+    msg_t msg;
+    msg.content.value = (int)msg_content;
+    msg_send(&msg, animation_pid);
+
+  }else {
+      printf("WARN: Couldn't extract payload (nothing for me?!) [buffer: %s]\n", input);
+    //return -1;
+  }*/
+
+    message_content *msg_content = malloc(sizeof(message_content));
+    msg_content->action = type;
+    for(int i=0;i<MAXPIX;i++)
+    {
+      msg_content->parameters[i] = parameters[i];
+      printf(">>>>>>>>>>> msg_content param %i\n", msg_content->parameters[i]);
+    }
+    msg_t msg;
+    msg.content.value = (int)msg_content;
+    msg_send(&msg, animation_pid);
+
+  memcpy(response, "TODO", 4);
+
+  printf("<>>>>>>> before coap_make_response %i\n", response);
 
   return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
                             id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,

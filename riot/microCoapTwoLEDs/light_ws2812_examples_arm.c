@@ -5,9 +5,11 @@ struct cRGB led[MAXPIX];
 
 void set_simple_color(int rgb)
 {
+
 	// set simple color to pixs
-	if(rgb < 0 || rgb > 0xffffff)
+	if(rgb < 0x000000 || rgb > 0xffffff)
 	{
+    printf(">>>> rgb %i\n", rgb);
 		printf("#ERROR: INVALID COLOR FORMAT! GOT (%X), EXPECTED BETWEEN 0x000000 and 0xFFFFFF\n");
 		return;
 	}
@@ -148,4 +150,24 @@ void pulsating_light_waves(int *direction, int *pix)
 
   ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
   xtimer_usleep(50000);
+}
+
+void fft_equalizer(int *fft_array)
+{
+  //printf(">>>>> in fft equalizer funct ... \n");
+  for (int i = 0; i < MAXPIX; i++)
+  {
+    //printf("fftArray %i\n", fft_array[i]);
+    /*led[i].r = fft_array[i];
+    led[i].g = fft_array[i];
+    led[i].b = fft_array[i];*/
+
+    led[i].r = (fft_array[i] & 0xff0000) >> 16;
+    led[i].g = (fft_array[i] & 0x00ff00) >> 8;
+    led[i].b = fft_array[i] & 0x0000ff;
+  }
+
+  ws2812_sendarray((uint8_t *)&led, MAXPIX*3);
+  xtimer_usleep(5000);
+
 }

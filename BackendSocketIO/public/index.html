@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>FFT Demo</title>
+      <meta charset="utf-8">
+		<link rel="stylesheet" href="styles.css">
+   </head>
+   <body>
+		<h1>FFT Demo</h1>
+		<script src="/socket.io/socket.io.js"></script>
+
+		 <button onclick="fft_clicked()">FFT</button>
+		 <script>
+		 	var socket = io.connect();
+			 function fft_clicked(){
+			   socket.emit('fft');
+			   //socket.send('fft_data ...');
+			   webaudio();
+			 }
+		</script>
+
+		<p>Volume</p>
+		<input id="volume" type="range" min="0" max="1" step="0.1" value="0.5"/>
+
+		<canvas id="canvas" width="300" height="300" style="border:1px solid #000000;">Canvas to show content!</canvas>
+
+
+		<script type="text/javascript">
+
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+
+		WIDTH = canvas.width;
+		HEIGHT = canvas.height;
+
+		function sleep(time, callback) {
+		    var stop = new Date().getTime();
+		    while(new Date().getTime() < stop + time) {
+		        ;
+		    }
+		    callback();
+		}
+
+		function webaudio() {
+
+		    var audioContext = new AudioContext();
+
+		    console.log("audio is starting up ...");
+
+		    var BUFF_SIZE_RENDERER = 16384;
+
+		    var audioInput = null,
+		    microphone_stream = null,
+		    gain_node = null,
+		    script_processor_node = null,
+		    script_processor_analysis_node = null,
+		    analyser_node = null;
+
+		    if (!navigator.mediaDevices.getUserMedia)
+		        navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia ||
+		    navigator.mediaDevices.mozGetUserMedia || navigator.mediaDevices.msGetUserMedia;
+
+		    if (navigator.mediaDevices.getUserMedia){
+
+		        navigator.getUserMedia({audio:true}, 
+		            function(stream) {
+		            	start_microphone(stream);
+		            },
+		            function(e) {
+		                alert('Error capturing audio.');
+		            }
+		            );
+
+		    } else { alert('getUserMedia not supported in this browser.'); }
+
+		    // ---
+
+		    function show_some_data(given_typed_array, _array_spectral_color, label) {
+
+		        var size_buffer = _array_spectral_color.length;
+		        var index = 0;
+
+				if (label === "frequency") 
+				{
+		            ctx.fillStyle = 'rgb(200, 200, 200)';
+		            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+		            //ctx.fillStyle = '#00CCFF';
+
+		            var fft_bar_pos, fft_bar_width;
+		            var fft_bar_pos = fft_bar_width = WIDTH/size_buffer;
+
+					//console.log("size_buffer ", size_buffer);
+					//console.log("fft_bar_width ", fft_bar_width);
+
+		            for (var i = 0; i < size_buffer; i++) 
+		            {
+		                var x = i*fft_bar_pos;
+		                console.log("x ", x);
+		                var fft_bar_height = -(given_typed_array[i]/2);
+		                ctx.fillRect(x, HEIGHT, fft_bar_width, fft_bar_height);
+		                ctx.fillStyle = '#'+_array_spectral_color[i].toString(16);
+		            }
+
+			    }
+			    /*else if(label === "time") 
+			    {
+		            for (; index < num_row_to_display && index < size_buffer; index += 1) {
+
+		                var curr_value_time = (given_typed_array[index] / 128) - 1.0;
+		                console.log(curr_value_time);
+		            }
+
+		        }else {
+		            throw new Error("ERROR - must pass time or frequency");
+		        }*/
+		    }
+
+		    /*function process_microphone_buffer(event) {
+
+		        var i, N, inp, microphone_output_buffer;
+
+		        microphone_output_buffer = event.inputBuffer.getChannelData(0); // just mono - 1 channel for now
+		    }*/
+
+			function rgb2hex(red, green, blue) {
+			        var rgb = blue | (green << 8) | (red << 16);
+			        //return '#' + (0x1000000 + rgb).toString(16).slice(1)
+			        return (0x1000000 + rgb).toString(16).slice(1)
+		  	}
+
+		  	// l is wavelength
+			/*function spectral_color(l) // RGB <0,1> <- lambda l <400,700> [nm]
+			{
+			    var t, r=0.0, g=0.0, b=0.0;
+			         if ((l>=400.0)&&(l<410.0)) { t=(l-400.0)/(410.0-400.0); r=    (0.33*t)-(0.20*t*t); }
+			    else if ((l>=410.0)&&(l<475.0)) { t=(l-410.0)/(475.0-410.0); r=0.14-(0.13*t*t); }
+			    else if ((l>=545.0)&&(l<595.0)) { t=(l-545.0)/(595.0-545.0); r=    +(1.98*t)-(     t*t); }
+			    else if ((l>=595.0)&&(l<650.0)) { t=(l-595.0)/(650.0-595.0); r=0.98+(0.06*t)-(0.40*t*t); }
+			    else if ((l>=650.0)&&(l<700.0)) { t=(l-650.0)/(700.0-650.0); r=0.65-(0.84*t)+(0.20*t*t); }
+
+			         if ((l>=415.0)&&(l<475.0)) { t=(l-415.0)/(475.0-415.0); g=             (0.80*t*t); }
+			    else if ((l>=475.0)&&(l<590.0)) { t=(l-475.0)/(590.0-475.0); g=0.8 +(0.76*t)-(0.80*t*t); }
+			    else if ((l>=585.0)&&(l<639.0)) { t=(l-585.0)/(639.0-585.0); g=0.84-(0.84*t)           ; }
+
+			         if ((l>=400.0)&&(l<475.0)) { t=(l-400.0)/(475.0-400.0); b=    (2.20*t)-(1.50*t*t); }
+			    else if ((l>=475.0)&&(l<560.0)) { t=(l-475.0)/(560.0-475.0); b=0.7 -(     t)+(0.30*t*t); }
+
+				console.log("color  ", ((r*255)), ((g*255)), (b*255));
+				console.log("color_hex  ", rgb2hex(r*255,g*255,b*255));
+
+			    return parseInt(rgb2hex(r*255,g*255,b*255), 16);
+			}*/
+
+
+	        // takes wavelength in nm and returns an rgba value
+	        /*function wavelengthToColor(wavelength) {
+	            var R=0,
+	                G=0,
+	                B=0,
+	                alpha=0,
+	                colorSpace,
+	                wl = wavelength,
+	                gamma = 1;
+	     
+	     
+	            if (wl >= 380 && wl < 440) {
+	                R = -1 * (wl - 440) / (440 - 380);
+	                G = 0;
+	                B = 1;
+	           } else if (wl >= 440 && wl < 490) {
+	               R = 0;
+	               G = (wl - 440) / (490 - 440);
+	               B = 1;  
+	            }else if (wl >= 490 && wl < 510) {
+	                R = 0;
+	                G = 1;
+	                B = -1 * (wl - 510) / (510 - 490);
+	            } else if (wl >= 510 && wl < 580) {
+	                R = (wl - 510) / (580 - 510);
+	                G = 1;
+	                B = 0;
+	            } else if (wl >= 580 && wl < 645) {
+	                R = 1;
+	                G = -1 * (wl - 645) / (645 - 580);
+	                B = 0.0;
+	            } else if (wl >= 645 && wl <= 780) {
+	                R = 1;
+	                G = 0;
+	                B = 0;
+	            } else {
+	                R = 0;
+	                G = 0;
+	                B = 0;
+	            }
+	     
+	            // intensty is lower at the edges of the visible spectrum.
+	            if (wl > 780 || wl < 380) {
+	                alpha = 0;
+	            } else if (wl > 700) {
+	                alpha = (780 - wl) / (780 - 700);
+	            } else if (wl < 420) {
+	                alpha = (wl - 380) / (420 - 380);
+	            } else {
+	                alpha = 1;
+	            }
+	     
+	            //colorSpace = ["rgba(" + (R * 100) + "%," + (G * 100) + "%," + (B * 100) + "%, " + alpha + ")", R, G, B, alpha]
+	     
+	            // colorSpace is an array with 5 elements.
+	            // The first element is the complete code as a string.  
+	            // Use colorSpace[0] as is to display the desired color.  
+	            // use the last four elements alone or together to access each of the individual r, g, b and a channels.  
+	           
+	            //return colorSpace;
+
+	            return parseInt(rgb2hex(R*100,G*100,B*100), 16);
+	           
+	        }*/
+
+			/**
+			 * HSV color wheel crawling lights
+			 */
+			function hsv_crawling_lights(intensity, H)
+			{
+				// HSV in RGB
+				var h=(H/60).toFixed(0);
+				var f=Math.abs((H/60)-h);
+				var q=Math.abs((1-f)*intensity);
+				var t=f*intensity;
+
+				if(0==h || h==6)
+				{ r=intensity; g=t; b=0; }
+				if(h==1)
+				{ r=q; g=intensity; b=0; }
+				if(h==2)
+				{ r=0; g=intensity; b=t; }
+				if(h==3)
+				{ r=0; g=q; b=intensity; }
+				if(h==4)
+				{ r=t; g=0; b=intensity; }
+				if(h==5)
+				{ r=intensity; g=0; b=q; }
+
+				return parseInt(rgb2hex(r,g,b), 16);
+			}
+
+
+		    // map color spectrum of visible light to frequency
+		    function bindColor2Frequency(array_freq_domain, _array_spectral_color)
+		    {
+		    	var num_fft_elements = array_freq_domain.length;
+		    	var array_freq_color = new Uint32Array(num_fft_elements);
+				for (var i = 0; i < num_fft_elements; i++)
+				{
+					var r = ((_array_spectral_color[i] & 0xff0000) >> 16)/255.0;
+					var g = ((_array_spectral_color[i] & 0x00ff00) >> 8)/255.0;
+					var b = (_array_spectral_color[i] & 0x0000ff)/255.0;
+
+					array_freq_color[i] = (r*array_freq_domain[i] << 16) + (g*array_freq_domain[i] << 8) + (b*array_freq_domain[i]);
+				}
+
+		    	//socket.send(array_freq_color);
+		    }
+
+		    function start_microphone(stream){
+
+		        gain_node = audioContext.createGain();
+		        gain_node.connect( audioContext.destination );
+
+		        microphone_stream = audioContext.createMediaStreamSource(stream);
+		        microphone_stream.connect(gain_node); 
+
+		        script_processor_node = audioContext.createScriptProcessor(BUFF_SIZE_RENDERER, 1, 1);
+		        //script_processor_node.onaudioprocess = process_microphone_buffer;
+
+		        microphone_stream.connect(script_processor_node);
+
+		        // --- enable volume control for output speakers
+
+		        document.getElementById('volume').addEventListener('change', function() {
+
+		            var curr_volume = this.value;
+		            gain_node.gain.value = curr_volume;
+
+		            console.log("curr_volume ", curr_volume);
+		        });
+
+		        // --- setup FFT
+
+		        script_processor_analysis_node = audioContext.createScriptProcessor(2048, 1, 1);
+		        script_processor_analysis_node.connect(gain_node);
+
+		        analyser_node = audioContext.createAnalyser();
+		        analyser_node.smoothingTimeConstant = 0.4;
+		        analyser_node.fftSize = 64;
+
+		        microphone_stream.connect(analyser_node);
+
+		        analyser_node.connect(script_processor_analysis_node);
+
+		        var buffer_length = analyser_node.frequencyBinCount;
+
+		        var array_freq_domain = new Uint8Array(buffer_length);
+		        //var array_time_domain = new Uint8Array(buffer_length);
+
+		        //console.log("buffer_length " + buffer_length);
+
+		        // calculate the array of wavelength snippets to the corresponding frequency
+				var _array_wavelength = new Float32Array(analyser_node.fftSize/4.0);
+				var _fft_wavelength_size = _array_wavelength.length;
+				// spectral frequency 380nm to 780nm
+				var _spectral_snippet = (400.0/_fft_wavelength_size);
+
+				for (var i = 0; i < _fft_wavelength_size; i++)
+				{
+					_array_wavelength[i] = 380 + _spectral_snippet*i;
+					//console.log("_array_wavelength[i] ", _array_wavelength[i]);
+				}
+
+				//console.log("_fft_wavelength_size ", _fft_wavelength_size);
+
+				var _array_spectral_color = new Uint32Array(_fft_wavelength_size);
+
+				/*for (var i = 0; i < _fft_wavelength_size; i++)
+				{
+					_array_spectral_color[i] = hsv_crawling_lights(V, H);
+					console.log("_array_spectral_color[i] ", _array_spectral_color[i]);
+				}*/
+
+
+				// HSV step-size: 260 .. 0 .. -40 (360)
+				var H = 300;
+				var step_hsv = H/_fft_wavelength_size;
+
+		        script_processor_analysis_node.onaudioprocess = function() 
+		        {
+		        	sleep(50, function()
+		        	{
+			            // get the average for the first channel
+			            analyser_node.getByteFrequencyData(array_freq_domain);
+			            //analyser_node.getByteTimeDomainData(array_time_domain);
+
+						//console.log(array_time_domain);
+
+			            // draw the spectrogram
+			            if (microphone_stream.playbackState == microphone_stream.PLAYING_STATE) 
+			            {
+			            	for(var i=0; i<_fft_wavelength_size; i++)
+			            	{
+			            		//console.log("i ", i);
+			            		if((H-(step_hsv*i)) >= 40)
+			            		{
+			                		_array_spectral_color[i] = hsv_crawling_lights(array_freq_domain[i], H-(step_hsv*i)-40); // H = 260 .. 0
+			                		//console.log("H ", H-(step_hsv*i)-40);
+			            		}else
+			            		{
+			                		_array_spectral_color[i] = hsv_crawling_lights(array_freq_domain[i], 500-(step_hsv*i)); // H = 360 .. 320
+			                		//console.log("H2 ", 500-(step_hsv*i));
+
+			            		}
+			                	//console.log("_array_spectral_color ", _array_spectral_color[i]);
+			            	}
+
+							socket.send(_array_spectral_color);
+
+
+			                //bindColor2Frequency(array_freq_domain, _array_spectral_color);
+
+							show_some_data(array_freq_domain, _array_spectral_color, "frequency");
+
+			                //socket.send(array_freq_domain);
+
+			                //show_some_data(array_time_domain, 16, "time"); // store this to record to aggregate buffer/file
+			                //draw(array_freq_domain);
+			            }
+		            });
+		        };
+		    }
+
+		    /*function draw(array_freq_domain)
+		    {
+		        console.log("FREQUENCY: ", array_freq_domain.length);
+		    }*/
+
+		} //  webaudio_tooling_obj = function()
+
+		</script>
+
+
+
+
+   </body>
+</html>

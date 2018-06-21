@@ -4,7 +4,7 @@
 #include "msg.h"
 #include "shell.h"
 
-#define MAIN_QUEUE_SIZE     (8)
+#define MAIN_QUEUE_SIZE     (1)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 extern kernel_pid_t startServer(void);

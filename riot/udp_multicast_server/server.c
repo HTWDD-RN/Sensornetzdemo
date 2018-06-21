@@ -10,8 +10,8 @@
 #include "net/ipv6/addr.h"
 #include "thread.h"
 
-#define SERVER_MSG_QUEUE_SIZE   (8)
-#define SERVER_BUFFER_SIZE      (64)
+#define SERVER_MSG_QUEUE_SIZE   (1)
+#define SERVER_BUFFER_SIZE      (1024)
 
 static char *PORTSTRING = "5683";
 static char *MULTICAST_ADDRESS = "ff02::1";
@@ -36,6 +36,10 @@ int udp_send(char *addr, char *payload)
         return 1;
     }
     remote.port = GCOAP_PORT;
+
+    printf(">>>>>> playload %s\n", payload);
+    printf(">>>>>> addr %s\n", addr);
+
     if((res = sock_udp_send(NULL, payload, strlen(payload), &remote)) < 0) {
         puts("could not send");
     }
@@ -58,6 +62,7 @@ void *_multicast_event_loop(void *args) {
         msg_t msg;
         msg_receive(&msg);
         char *content = (char *)msg.content.value;
+        printf(">>>>>>  >>>> content %s\n", content);
         udp_send(MULTICAST_ADDRESS, content);
         free(content);
     }
@@ -136,6 +141,9 @@ void *_udp_server(void *args)
             char *msg_content = malloc(sizeof(server_buffer));
             strcpy(msg_content, server_buffer);
             msg.content.value = (int)msg_content;
+            
+            printf(">>>>>>> ### value %i\n", (int)msg.content.value);
+
             msg_try_send(&msg, multicast_pid);
         }
     }

@@ -26,3 +26,5 @@ float map2PI(int pix);
 int scale(float val);
 
 void pulsating_light_waves(int *direction, int *pix);
+
+void fft_equalizer(int *fft_array);

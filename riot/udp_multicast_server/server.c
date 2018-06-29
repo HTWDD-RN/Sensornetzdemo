@@ -10,7 +10,7 @@
 #include "net/ipv6/addr.h"
 #include "thread.h"
 
-#define SERVER_MSG_QUEUE_SIZE   (1)
+#define SERVER_MSG_QUEUE_SIZE   (8)
 #define SERVER_BUFFER_SIZE      (1024)
 
 static char *PORTSTRING = "5683";
@@ -37,8 +37,8 @@ int udp_send(char *addr, char *payload)
     }
     remote.port = GCOAP_PORT;
 
-    printf(">>>>>> playload %s\n", payload);
-    printf(">>>>>> addr %s\n", addr);
+    //printf(">>>>>> playload %s\n", payload);
+    //printf(">>>>>> addr %s\n", addr);
 
     if((res = sock_udp_send(NULL, payload, strlen(payload), &remote)) < 0) {
         puts("could not send");
@@ -49,11 +49,11 @@ int udp_send(char *addr, char *payload)
     return 0;
 }
 
-void _resp_handler(unsigned req_state, coap_pkt_t* pdu) {
+/*void _resp_handler(unsigned req_state, coap_pkt_t* pdu) {
     (void) req_state;
     (void) pdu;
     sending = false;
-}
+}*/
 
 void *_multicast_event_loop(void *args) {
     (void)args;
@@ -62,21 +62,27 @@ void *_multicast_event_loop(void *args) {
         msg_t msg;
         msg_receive(&msg);
         char *content = (char *)msg.content.value;
-        printf(">>>>>>  >>>> content %s\n", content);
-        udp_send(MULTICAST_ADDRESS, content);
+
+        //printf(">>>>>> strlen content %i\n", strlen(content));
+        //printf(">>>>>> content %s\n", content);
+        
+        // dont send small packages, strange behaviour of Messaging IPC
+        // thread receives packages smaller than 10 byte from time to time
+        if(strlen(content) > 10)
+            udp_send(MULTICAST_ADDRESS, content);
         free(content);
     }
     return NULL;
 }
 
-int test_multicast(int argc, char **argv) {
+/*int test_multicast(int argc, char **argv) {
 
     (void)argc;
     (void)argv;
 
-    char *path = "/LED/strip";
-    char *payloadOff = "ff02::1#0"; // 0x000000 -> 100% off
-    char *payloadOn = "ff02::1#16711680"; // 0xff0000 -> 100% red
+    char *path = "/LED/fft";
+    //char *payloadOff = "ff02::1#0"; // 0x000000 -> 100% off
+    char *payloadOn = "ff02::1#255"; // 0xff0000 -> 100% red
     int POST = 2;
     ipv6_addr_t addr;
 
@@ -85,24 +91,26 @@ int test_multicast(int argc, char **argv) {
         return -1;
     }
 
-    for (int i = 0; i < 20; i++) {
+    // send packages in a for loop, multiple of times, to show effect of multicast routing compared to unicast
+    //for (int i = 0; i < 20; i++) {
         uint8_t buf[GCOAP_PDU_BUF_SIZE];
         coap_pkt_t pdu;
 
         gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, POST, path);
-        char *payload = i % 2 == 0 ? payloadOn : payloadOff;
+        //char *payload = i % 2 == 0 ? payloadOn : payloadOff;
+        char *payload = payloadOn;
         printf("Sending: %s\n", payload);
         memcpy(pdu.payload, payload, strlen(payload));
         size_t len = gcoap_finish(&pdu, strlen(payload), COAP_FORMAT_TEXT);
 
         gcoap_req_send(buf, len, &addr, GCOAP_PORT, _resp_handler);
-        sending = true;
-        while (sending); // wait until response arrived
-        usleep(500000);
-    }
+        //sending = true;
+        //while (sending); // wait until response arrived
+        //usleep(500000);
+    //}
 
     return 0;
-}
+}*/
 
 void *_udp_server(void *args)
 {
@@ -133,18 +141,31 @@ void *_udp_server(void *args)
             puts("No data received");
         }
         else {
+            //printf(">>>>>> res %i\n", res);
+            //server_buffer[res] = '\0';
             server_buffer[res] = '\0';
-            printf("Recvd: %s\n", server_buffer);
+            //printf("Recvd: %s\n", server_buffer);
 
             // send packages as multicast
             msg_t msg;
-            char *msg_content = malloc(sizeof(server_buffer));
+
+            //printf(">>>>>>> sizeof(server_buffer) %i\n", sizeof(server_buffer));
+            //printf(">>>>>>> sizeof(server_buffer[0]) %i\n", sizeof(server_buffer)/sizeof(server_buffer[0]));
+
+            //char *msg_content = (char *)malloc(sizeof(server_buffer)/sizeof(server_buffer[0]));
+            char *msg_content = (char *)malloc(strlen(server_buffer));
+            //printf(">>>>> ### >>>> strlen(msg_content) %i\n", strlen(msg_content));
             strcpy(msg_content, server_buffer);
+
             msg.content.value = (int)msg_content;
             
-            printf(">>>>>>> ### value %i\n", (int)msg.content.value);
 
-            msg_try_send(&msg, multicast_pid);
+            //printf(">>>>>>> ### (int)msg_content %i\n", (int)msg_content);
+            //printf(">>>>>>> ### (int)msg_content.value %i\n", (int)msg.content.value);
+
+            //printf(">>>>>> msg_send: %i\n", msg_send(&msg, multicast_pid));
+
+            msg_send(&msg, multicast_pid);
         }
     }
 

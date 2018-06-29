@@ -9,14 +9,44 @@
 		<h1>FFT Demo</h1>
 		<script src="/socket.io/socket.io.js"></script>
 
-		 <button onclick="fft_clicked()">FFT</button>
-		 <script>
+
+			<input type="checkbox" id="1" onclick="selectOnlyThis(this.id)" /> Unicast
+			<input type="checkbox" id="2" onclick="selectOnlyThis(this.id)" /> Multicast intensity
+			<input type="checkbox" id="3" onclick="selectOnlyThis(this.id)" /> Multicast color
+
+			<button onclick="fft_clicked()">FFT</button>
+
+		<script>
 		 	var socket = io.connect();
-			 function fft_clicked(){
-			   socket.emit('fft');
-			   //socket.send('fft_data ...');
-			   webaudio();
-			 }
+
+		 	var routing = [];
+		 	// default settings, unicast = true
+		    for (var i = 1;i <= 3; i++) {
+	        	document.getElementById(i).checked = false;
+		        routing[i-1] = 0;
+		    }
+		 	document.getElementById("1").checked = true;
+			routing[0] = 1;
+			console.log("routing " + routing);
+			socket.emit('settings', { 'data': routing });
+
+
+			function selectOnlyThis(id) {
+			    for (var i = 1;i <= 3; i++){
+			        document.getElementById(i).checked = false;
+			        routing[i-1] = 0;
+			    }
+			    document.getElementById(id).checked = true;
+			    routing[id-1] = 1;
+			    console.log("routing " + routing);
+
+			    socket.emit('settings', { 'data': routing });
+			}
+
+			function fft_clicked() {
+				webaudio();
+			}
+
 		</script>
 
 		<p>Volume</p>
@@ -298,7 +328,7 @@
 
 		        analyser_node.connect(script_processor_analysis_node);
 
-		        var buffer_length = analyser_node.frequencyBinCount;
+		        var buffer_length = analyser_node.frequencyBinCount/2.0;
 
 		        var array_freq_domain = new Uint8Array(buffer_length);
 		        //var array_time_domain = new Uint8Array(buffer_length);
@@ -361,7 +391,12 @@
 			                	//console.log("_array_spectral_color ", _array_spectral_color[i]);
 			            	}
 
-							socket.send(_array_spectral_color);
+							if(routing[0])
+								socket.send(array_freq_domain);
+							else if(routing[1])
+								socket.send(_array_spectral_color);
+							else if(routing[2])
+								socket.send(_array_spectral_color);
 
 
 			                //bindColor2Frequency(array_freq_domain, _array_spectral_color);

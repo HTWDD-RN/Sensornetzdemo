@@ -44,12 +44,12 @@ void *_animation_loop(void *args) {
             // set action type 
             action = content->action;
 
-            printf("<<<<>>> action %i\n", action);
+            //printf("<<<<>>> action %i\n", action);
 
             if(action != 5)
             {
                 parameter = content->parameter;
-                printf("<<<<>>> parameter %i\n", parameter);
+                //printf("<<<<>>> parameter %i\n", parameter);
             }else if(action == 5)
             {
                 for(int i=0;i<MAXPIX;i++)
@@ -251,8 +251,8 @@ int isMyIP(char *addr)
     if (ipv6_addr_from_str(&givenAddr, addr) == NULL) {
         printf("ERROR: Tried to compare IP address, but (%s) is not a valid IP.\n", addr);
 
-        printf("givenAddr ERROR %i\n", givenAddr);
-            printf("addr ERROR %s\n", addr);
+        //printf("givenAddr ERROR %i\n", givenAddr);
+        //    printf("addr ERROR %s\n", addr);
 
         return 0;
     }

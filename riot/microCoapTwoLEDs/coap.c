@@ -235,14 +235,37 @@ static int handle_post_led_fft(coap_rw_buffer_t *scratch,
   for(int i=0; i<MAXPIX; i++)
   {
     parameters[i] = 0xff0000;
-    printf("parameters %i\n", parameters[i]);
+    //printf("parameters %i\n", parameters[i]);
   }
 
   int type = FFT;
 
 
-  /*const char *input = (const char*)inpkt->payload.p; 
+  const char *input = (const char*)inpkt->payload.p; 
   // input-example: ip-address + type + color (hex-code) + ; + \n
+  //printf("%s\n", input);
+
+
+  // input types:
+  // unicast:   ipv6 global scope IP (node) + payload
+  //            2001:db8::585b:2819:6ba4:50b2 + payload
+
+  // same package to all nodes
+  // multicast: ipv6 global scope IP (border-router) + payload
+  //            2001:db8::585b:2819:6ba4:50b2 + payload
+
+  // package to all nodes, but specific payload for specific node
+  // multicast: ipv6 global scope IP (border-router) + node related payload
+  //            2001:db8::585b:2819:6ba4:50b2 + payload
+  //            payload: (needs to be parsed on microCoapServer)
+  //                2001:db8::5841:1f19:c2b6:b792 + payload
+  //                2001:db8::585b:1801:4b51:d932 + payload
+  //                2001:db8::585f:1b3c:ad00:1726 + payload
+  //                ...
+
+
+
+/*
 
   char buffer[MAXPIX*6+1+1+5]; // PIX Color + type + ; + \n
 
@@ -286,7 +309,7 @@ static int handle_post_led_fft(coap_rw_buffer_t *scratch,
     for(int i=0;i<MAXPIX;i++)
     {
       msg_content->parameters[i] = parameters[i];
-      printf(">>>>>>>>>>> msg_content param %i\n", msg_content->parameters[i]);
+      //printf(">>>>>>>>>>> msg_content param %i\n", msg_content->parameters[i]);
     }
     msg_t msg;
     msg.content.value = (int)msg_content;
@@ -294,7 +317,7 @@ static int handle_post_led_fft(coap_rw_buffer_t *scratch,
 
   memcpy(response, "TODO", 4);
 
-  printf("<>>>>>>> before coap_make_response %i\n", response);
+  //printf("<>>>>>>> before coap_make_response %i\n", response);
 
   return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
                             id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,

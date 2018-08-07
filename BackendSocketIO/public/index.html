@@ -9,10 +9,8 @@
 		<h1>FFT Demo</h1>
 		<script src="/socket.io/socket.io.js"></script>
 
-
 			<input type="checkbox" id="1" onclick="selectOnlyThis(this.id)" /> Unicast
-			<input type="checkbox" id="2" onclick="selectOnlyThis(this.id)" /> Multicast intensity
-			<input type="checkbox" id="3" onclick="selectOnlyThis(this.id)" /> Multicast color
+			<input type="checkbox" id="2" onclick="selectOnlyThis(this.id)" /> Multicast
 
 			<form>
 				<input id="slider1" type="range" min="1" max="60" step="1" value="20" list="ticks" oninput="outputUpdate(this.value)"/>
@@ -63,7 +61,7 @@
 
 		 	var routing = [];
 		 	// default settings_routing, unicast = true
-		    for (var i = 1;i <= 3; i++) {
+		    for (var i = 1;i <= 2; i++) {
 	        	document.getElementById(i).checked = false;
 		        routing[i-1] = 0;
 		    }
@@ -87,7 +85,7 @@
 
 
 			function selectOnlyThis(id) {
-			    for (var i = 1;i <= 3; i++){
+			    for (var i = 1;i <= 2; i++){
 			        document.getElementById(i).checked = false;
 			        routing[i-1] = 0;
 			    }
@@ -367,16 +365,19 @@
 
 			            	for(var i=0; i<numOfNodes; i++)
 							{
+								console.log("numOfNodes ", numOfNodes);
+
 								var r=0,g=0,b=0;
-								for(var j=i*(buffer_length/numOfNodes); j<(i+1)*(buffer_length/numOfNodes); j++)
+								for(var j=parseInt(i*(buffer_length/numOfNodes)); j<parseInt((i+1)*(buffer_length/numOfNodes)); j++)
 								{
 									//console.log("_array_spectral_color ", j, " ", _array_spectral_color[j]);
 
 									//console.log("r_ ", (parseInt(_array_spectral_color[j], 16) >> 16) & 255);
 
-									r += ((parseInt(_array_spectral_color[j], 16) >> 16) & 255);
-									g += ((parseInt(_array_spectral_color[j], 16) >> 8) & 255);
-									b += (parseInt(_array_spectral_color[j], 16) & 255);
+									var int_p = parseInt(_array_spectral_color[j], 16);
+									r += ((int_p >> 16) & 255);
+									g += ((int_p >> 8) & 255);
+									b += (int_p & 255);
 
 									//console.log("r ", r, " ", "g ", g, " ", "b ", b);
 
@@ -388,17 +389,15 @@
 								b /= (buffer_length/numOfNodes);
 
 								array_avg_color[i] = rgb2hex(r,g,b);
-								//console.log("array_avg_color ", i, " ", array_avg_color[i]);
+								console.log("array_avg_color ", i, " ", array_avg_color[i]);
 							}
 
 
 
 							if(routing[0])
-								socket.send(_array_spectral_color);
+								socket.send(array_avg_color);
 							else if(routing[1])
-								socket.send(array_freq_domain);
-							else if(routing[2])
-								socket.send(_array_spectral_color);
+								socket.send(array_avg_color);
 
 
 			                //bindColor2Frequency(array_freq_domain, _array_spectral_color);

@@ -63,7 +63,6 @@ io.on('connection', function(client) {
     client.on('settings_routing', function(data) {
       routing[0] = data.data[0];
       routing[1] = data.data[1];
-      routing[2] = data.data[2];
 
       console.log('settings_routing: ' + routing);
     });
@@ -85,13 +84,14 @@ io.on('connection', function(client) {
       // number of LEDs per node
       var numOfPix = 4;
 
-      for(var i = 0; i<buffer_length; i++)
+      /*for(var i = 0; i<buffer_length; i++)
       {
         message[i] = message[i].toString(16).toUpperCase();
         // padding of hex values, blocks of 6 values are required e.g. FFFFFF
         while (message[i].length < 6) {message[i] = "0" + message[i];}
-      }
+      }*/
 
+	  console.log(numOfNodes);
       console.log(message);
 
   		// connection to coap to send data to BR
@@ -123,40 +123,37 @@ io.on('connection', function(client) {
         {
           payload = '';
           //payload += NODE_IPs[i]+'&'+actionType+'&';
-          payload += actionType;
+          payload += NODE_IPs[i]+'&'+actionType+'&';
 
           var tmp_msg = '';
-          for(var j=i*numOfPix; j<(i+1)*numOfPix; j++)
-            tmp_msg += message[j];
+          //for(var j=i*numOfPix; j<(i+1)*numOfPix; j++)
+          //  tmp_msg += message[j];
 
-          payload += tmp_msg;
+          //payload += tmp_msg;
+          payload += message[i];
 
           console.log("payload ", payload);
 
           coap.post(NODE_IPs[i], '/LED/fft', payload, 'text/plain');
         }
 
-      // multicast -> colored values, same package to all nodes
       }else if(routing[1]){
-
-
-      // multicast -> colored values, package to all nodes but -> specific payload for specific node
-      }else if(routing[2]){
 
         payload = '';
         // put the payload together
         for(var i=0; i<numOfNodes; i++)
         {
-          payload += NODE_IPs[i]+'&'+actionType+'&';
+          payload += NODE_IPs[i]+'&'+actionType+'&'+message[i];
           
-          var tmp_msg = '';
+          /*var tmp_msg = '';
           for(var j=i*numOfNodes; j<(i+1)*numOfPix; j++)
-            tmp_msg += message[i];
+            tmp_msg += message[i];*/
 
           if(i < (numOfNodes-1))
-            payload += tmp_msg + ';\n';
-          else if(i == (numOfNodes-1))
-            payload += tmp_msg + ';\n';
+            payload += '#'; //payload += tmp_msg + '#';
+          
+          /*else if(i == (numOfNodes-1))
+            payload += tmp_msg;*/
         }
 
         console.log("payload ", payload);

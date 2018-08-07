@@ -1,0 +1,3 @@
+subjectAltName = DNS:192.168.2.104,IP:192.168.2.104,IP:127.0.0.1
+extendedKeyUsage = serverAuth
+extendedKeyUsage = clientAuth

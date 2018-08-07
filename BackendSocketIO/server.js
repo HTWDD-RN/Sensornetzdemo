@@ -5,9 +5,9 @@ const https = require('https');
 const fs = require('fs');
 
 const options = {
-  key: fs.readFileSync('server_certificate_docker/serverkey.pem', 'utf8'),
-  cert: fs.readFileSync('server_certificate_docker/servercert.pem', 'utf8'),
-  ca: fs.readFileSync('server_certificate_docker/cacert.pem', 'utf8')
+  key: fs.readFileSync('server_certificate_home/serverkey.pem', 'utf8'),
+  cert: fs.readFileSync('server_certificate_home/servercert.pem', 'utf8'),
+  ca: fs.readFileSync('server_certificate_home/cacert.pem', 'utf8')
 };
 
 var app = express();
@@ -24,7 +24,13 @@ const NODE2_IP = '2001:db8::585b:1801:4b51:d932';
 const NODE3_IP = '2001:db8::585f:1b3c:ad00:1726';
 const NODE4_IP = '2001:db8::585a:1f03:382e:891a';
 
-const NODE_IPs = [NODE1_IP, NODE2_IP, NODE3_IP, NODE4_IP];
+const NODE5_IP = '2001:db8::585b:1238:1c33:b366';
+const NODE6_IP = '2001:db8::585b:2c75:46f8:9fbe';
+const NODE7_IP = '2001:db8::585a:2704:6caf:16ba';
+const NODE8_IP = '2001:db8::585b:2b2f:c1dd:98c6';
+
+
+const NODE_IPs = [NODE1_IP, NODE2_IP, NODE3_IP, NODE4_IP, NODE5_IP, NODE6_IP, NODE7_IP, NODE8_IP];
 
 
 // multicast
@@ -47,27 +53,39 @@ const resServ = require('./src/services/resourceService');
 
 const routing = [];
 
+var numOfNodes;
+
+var buffer_length;
+
 io.on('connection', function(client) {
 
 	//when the server receives fft message, do this
-    client.on('settings', function(data) {
+    client.on('settings_routing', function(data) {
       routing[0] = data.data[0];
       routing[1] = data.data[1];
       routing[2] = data.data[2];
 
-      console.log('settings: ' + routing);
+      console.log('settings_routing: ' + routing);
+    });
+
+ 	// buffer_length/ fft_size
+ 	// number of nodes
+    client.on('settings', function(data) {
+      buffer_length = Math.pow(2,data.data[0])/2;
+      numOfNodes = data.data[1];
+
+      console.log('settings: ' + buffer_length);
+      console.log('settings: ' + numOfNodes);
     });
 
     client.on('message', function(message) {
     	
       var actionType = 5;
 
-      // number of nodes
-      var numOfNodes = 4;
       // number of LEDs per node
       var numOfPix = 4;
 
-      for(var i = 0; i<16; i++)
+      for(var i = 0; i<buffer_length; i++)
       {
         message[i] = message[i].toString(16).toUpperCase();
         // padding of hex values, blocks of 6 values are required e.g. FFFFFF
@@ -95,9 +113,28 @@ io.on('connection', function(client) {
       //                2001:db8::585f:1b3c:ad00:1726 + payload
       //                ...
 
+      var payload = '';
+
       // unicast -> intensity values
       if(routing[0]){
+        
+        // put the payload together
+        for(var i=0; i<numOfNodes; i++)
+        {
+          payload = '';
+          //payload += NODE_IPs[i]+'&'+actionType+'&';
+          payload += actionType;
 
+          var tmp_msg = '';
+          for(var j=i*numOfPix; j<(i+1)*numOfPix; j++)
+            tmp_msg += message[j];
+
+          payload += tmp_msg;
+
+          console.log("payload ", payload);
+
+          coap.post(NODE_IPs[i], '/LED/fft', payload, 'text/plain');
+        }
 
       // multicast -> colored values, same package to all nodes
       }else if(routing[1]){
@@ -106,27 +143,32 @@ io.on('connection', function(client) {
       // multicast -> colored values, package to all nodes but -> specific payload for specific node
       }else if(routing[2]){
 
+        payload = '';
+        // put the payload together
+        for(var i=0; i<numOfNodes; i++)
+        {
+          payload += NODE_IPs[i]+'&'+actionType+'&';
+          
+          var tmp_msg = '';
+          for(var j=i*numOfNodes; j<(i+1)*numOfPix; j++)
+            tmp_msg += message[i];
+
+          if(i < (numOfNodes-1))
+            payload += tmp_msg + ';\n';
+          else if(i == (numOfNodes-1))
+            payload += tmp_msg + ';\n';
+        }
+
+        console.log("payload ", payload);
+
+        coap.post(BORDER_ROUTER_IP, '/LED/fft', payload, 'text/plain');
 
       }
 
 
-      var payload = '';
-      // put the payload together
-      for(var i=0; i<numOfNodes; i++)
-      {
-        payload += NODE_IPs[i]+'&'+actionType+'&';
-        
-        var tmp_msg = '';
-        for(var j=i*numOfNodes; j<(i+1)*numOfPix; j++)
-          tmp_msg += message[i];
 
-        if(i < (numOfNodes-1))
-          payload += tmp_msg + '#';
-        else if(i == (numOfNodes-1))
-          payload += tmp_msg;
-      }
 
-      coap.post(BORDER_ROUTER_IP, '/LED/fft', payload, 'text/plain');
+      //coap.post(BORDER_ROUTER_IP, '/LED/fft', payload, 'text/plain');
       
       //coap.post(MULTICAST_IP, '/LED/fft', 'ff02::15'+message[4]+message[5]+message[6]+message[7], 'text/plain');
 

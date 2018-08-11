@@ -9,12 +9,12 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 extern kernel_pid_t startServer(void);
 
-extern int test_multicast(int argc, char **argv);
+//extern int test_multicast(int argc, char **argv);
 
-static const shell_command_t shell_commands[] = {
+/*static const shell_command_t shell_commands[] = {
     { "test", "test multicast configuration by pinging all nodes", test_multicast },
     { NULL, NULL, NULL }
-};
+};*/
 
 int main(void)
 {
@@ -26,8 +26,8 @@ int main(void)
     puts("Success! Starting interactive shell now for you…");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
-    //shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    //shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

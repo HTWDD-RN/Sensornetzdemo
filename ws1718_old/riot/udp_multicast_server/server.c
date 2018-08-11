@@ -49,11 +49,11 @@ int udp_send(char *addr, char *payload)
     return 0;
 }
 
-void _resp_handler(unsigned req_state, coap_pkt_t* pdu) {
+/*void _resp_handler(unsigned req_state, coap_pkt_t* pdu) {
     (void) req_state;
     (void) pdu;
     sending = false;
-}
+}*/
 
 void *_multicast_event_loop(void *args) {
     (void)args;
@@ -75,7 +75,7 @@ void *_multicast_event_loop(void *args) {
     return NULL;
 }
 
-int test_multicast(int argc, char **argv) {
+/*int test_multicast(int argc, char **argv) {
 
     (void)argc;
     (void)argv;
@@ -110,7 +110,7 @@ int test_multicast(int argc, char **argv) {
     //}
 
     return 0;
-}
+}*/
 
 void *_udp_server(void *args)
 {

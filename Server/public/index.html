@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FFT Demo</title>
+		<meta charset="utf-8">
+			<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<h1>FFT Demo</h1>
+		<script src="/socket.io/socket.io.js"></script>
+
+
+		<!-- rounded light switch -->
+		Light
+		<label class="switch">
+		  <input type="checkbox" id="light_switch" onclick="lightSwitch(this.checked)"/>
+		  <span class="slider round"></span>
+		</label>
+
+
+		<!-- routing checkboxes -->
+		<input type="checkbox" id="1" onclick="select_routing(this.id)" /> Unicast
+		<input type="checkbox" id="2" onclick="select_routing(this.id)" /> Multicast
+
+
+		<!-- fps slider -->
+		<form>
+			<input id="fps_slider" type="range" min="1" max="60" step="1" value="10" list="ticks_fps" 
+			oninput="fpsSlider(this.value)"/>
+		    FPS <output for=fps_slider id="fps_output">10</output>
+		</form>
+
+		<datalist id="ticks_fps">
+		    <option >1</option>
+		    <option>10</option>
+		    <option>20</option>
+		    <option>30</option>
+		    <option>40</option>
+		    <option>50</option>
+		    <option>60</option>
+		</datalist>
+
+
+		<!-- number of nodes slider -->
+		<form>
+			<input id="numOfNodes_slider" type="range" min="2" max="8" step="1" value="2" 
+			list="ticks_numOfNodes" oninput="numOfNodesSlider(this.value)"/>
+		    Num of Nodes <output for=numOfNodes_slider id="numOfNodes_output">2</output>
+		</form>
+
+		<datalist id="ticks_numOfNodes">
+		    <option>2</option>
+		    <option>3</option>
+		    <option>4</option>
+		    <option>5</option>
+		    <option>6</option>
+		    <option>7</option>
+		    <option>8</option>
+		</datalist>
+
+
+		<!-- fft button -->
+		<button onclick="fft_clicked()">FFT</button>
+
+
+		<script>
+		 	var socket = io.connect();
+
+		 	var routing = [];
+		    for (var i = 1;i <= 2; i++)
+		    {
+	        	document.getElementById(i).checked = false;
+		        routing[i-1] = 0;
+		    }
+
+		    // default settings_routing: multicast = true
+		 	document.getElementById("2").checked = true;
+			routing[1] = 1;
+
+			//console.log("routing " + routing);
+			socket.emit('settings_routing', { 'data': routing });
+
+
+			var fft_power = 6;
+			var numOfNodes = 2;
+			var settings = [];
+			var _array_node_colors = [];
+
+			settings[0] = fft_power;
+			settings[1] = numOfNodes;
+
+			socket.emit('settings_slider', { 'data': settings });
+
+
+			function select_routing(id)
+			{
+			    for (var i = 1;i <= 2; i++)
+			    {
+			        document.getElementById(i).checked = false;
+			        routing[i-1] = 0;
+			    }
+
+			    document.getElementById(id).checked = true;
+			    routing[id-1] = 1;
+			    //console.log("routing " + routing);
+
+			    socket.emit('settings_routing', { 'data': routing });
+			}
+
+
+			function fft_clicked()
+			{
+				webaudio();
+			}
+
+
+			function fpsSlider(num)
+			{
+				document.querySelector('#fps_output').value = num;
+				//console.log("slider fps " + num);
+			}
+
+
+			function numOfNodesSlider(num)
+			{
+				document.querySelector('#numOfNodes_output').value = num;
+				//console.log("slider numOfNodes " + num);
+
+				settings[1] = num;
+				numOfNodes = num;
+
+				socket.emit('settings_slider', { 'data': settings });
+			}
+
+
+			function lightSwitch(value)
+			{
+				//console.log("light switch " + value);
+				socket.emit('setting_light', { 'data': value });
+			}
+
+		</script>
+
+		<p>Volume</p>
+		<input id="volume" type="range" min="0" max="1" step="0.1" value="0.5"/>
+
+		<canvas id="canvas" width="300" height="300" style="border:0px solid #f5f5f5;">
+			Canvas to show content!</canvas> <!-- ffffff -->
+
+
+		<script type="text/javascript">
+
+			var canvas = document.getElementById('canvas');
+			var ctx = canvas.getContext('2d');
+
+			WIDTH = canvas.width;
+			HEIGHT = canvas.height;
+
+			function sleep(time, callback) 
+			{
+			    var stop = new Date().getTime();
+			    while(new Date().getTime() < stop + time) {
+			        ;
+			    }
+			    callback();
+			}
+
+			function webaudio() {
+
+			    var audioContext = new AudioContext();
+
+			    console.log("audio is starting up ...");
+
+			    var BUFF_SIZE_RENDERER = 16384;
+
+			    var audioInput = null,
+			    microphone_stream = null,
+			    gain_node = null,
+			    script_processor_node = null,
+			    script_processor_analysis_node = null,
+			    analyser_node = null;
+
+			    if (!navigator.mediaDevices.getUserMedia)
+			        navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia ||
+			    navigator.mediaDevices.mozGetUserMedia || navigator.mediaDevices.msGetUserMedia;
+
+			    if (navigator.mediaDevices.getUserMedia)
+			    {
+			        navigator.getUserMedia({audio:true}, 
+			            function(stream) 
+			            {
+			            	start_microphone(stream);
+			            },
+			            function(e) 
+			            {
+			                alert('Error capturing audio.');
+			            }
+			            );
+
+			    } else 
+			    { 
+			    	alert('getUserMedia not supported in this browser.'); 
+			    }
+
+
+			    function show_fft(given_typed_array, _array_spectral_color)
+			    {
+
+			        var size_buffer = _array_spectral_color.length;
+		            var fft_bar_width = WIDTH/size_buffer;
+
+		            ctx.fillStyle = 'rgb(245, 245, 245)';
+		            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+					//console.log("size_buffer ", size_buffer);
+					//console.log("WIDTH ", WIDTH);
+					//console.log("fft_bar_width ", fft_bar_width);
+
+		            for (var i = 0; i < size_buffer; i++)
+		            {
+		                var x = i*fft_bar_width;
+		                //console.log("x ", x);
+		                //console.log("given_typed_array ", i, " ", given_typed_array[i]);
+		                var fft_bar_height = -(given_typed_array[i]/2);
+		                ctx.fillRect(x-fft_bar_width*0.5, HEIGHT, fft_bar_width, fft_bar_height);
+		                ctx.fillStyle = '#'+_array_spectral_color[i].toString(16);
+		            }
+			    }
+
+			    /*function process_microphone_buffer(event) {
+
+			        var i, N, inp, microphone_output_buffer;
+
+			        microphone_output_buffer = event.inputBuffer.getChannelData(0); // just mono - 1 channel for now
+			    }*/
+
+			    /*
+					convert rgb to hex color format
+			    */
+				function rgb2hex(red, green, blue)
+				{
+				        var rgb =   blue | (green << 8) | (red << 16);
+				        return (0x1000000 + rgb).toString(16).slice(1);
+			  	}
+
+				/*
+					get hsv color
+				 */
+				function get_hsv_color(intensity, H)
+				{
+					// HSV in RGB
+					//console.log("H ", H);
+					var h=parseInt(H/60);
+					//console.log("h ", h);
+					
+					var f=(H/60)-h;
+					//console.log("f ", f);
+
+					var i = intensity/255;
+					var V = i; var S = 1;
+
+					var p=(V*(1-S));
+					var q=(V*(1-S*f));
+					var t=(V*(1-S*(1-f)));
+
+					if(h==0 || h==6)
+					{ r=V; g=t; b=p; }
+					if(h==1)
+					{ r=q; g=V; b=p; }
+					if(h==2)
+					{ r=p; g=V; b=t; }
+					if(h==3)
+					{ r=p; g=q; b=V; }
+					if(h==4)
+					{ r=t; g=p; b=V; }
+					if(h==5)
+					{ r=V; g=p; b=q; }
+
+					return rgb2hex(r*255,g*255,b*255);
+				}
+
+
+			    function start_microphone(stream)
+			    {
+
+			        gain_node = audioContext.createGain();
+			        gain_node.connect( audioContext.destination );
+
+			        microphone_stream = audioContext.createMediaStreamSource(stream);
+			        microphone_stream.connect(gain_node); 
+
+			        script_processor_node = audioContext.createScriptProcessor(BUFF_SIZE_RENDERER, 1, 1);
+			        //script_processor_node.onaudioprocess = process_microphone_buffer;
+
+			        microphone_stream.connect(script_processor_node);
+
+			        // enable volume control for output speakers
+			        document.getElementById('volume').addEventListener('change', function() {
+
+			            var curr_volume = this.value;
+			            gain_node.gain.value = curr_volume;
+			            //console.log("curr_volume ", curr_volume);
+			        });
+
+			        // setup FFT
+
+			        script_processor_analysis_node = audioContext.createScriptProcessor(2048, 1, 1);
+			        script_processor_analysis_node.connect(gain_node);
+
+			        analyser_node = audioContext.createAnalyser();
+			        analyser_node.smoothingTimeConstant = 0.4;
+			        analyser_node.fftSize = Math.pow(2,fft_power);
+
+			        microphone_stream.connect(analyser_node);
+
+			        analyser_node.connect(script_processor_analysis_node);
+
+			        var buffer_length = analyser_node.frequencyBinCount;
+			        var array_freq_domain = new Uint8Array(buffer_length);
+					var array_avg_color = [];
+					var _array_spectral_color = [];
+
+
+					// HSV step-size: 250 .. 0
+					var H = 250;
+					var step_hsv = H/Math.pow(2,fft_power-1);
+					//console.log("step_hsv ", step_hsv);
+
+
+			        script_processor_analysis_node.onaudioprocess = function()
+			        {
+			        	// defines fps
+			        	sleep(1000/document.getElementById('fps_slider').value, function()
+			        	{
+				            // get the average for the first channel
+				            analyser_node.getByteFrequencyData(array_freq_domain);
+				            //analyser_node.getByteTimeDomainData(array_time_domain);
+
+				            // draw the spectrogram
+				            if (microphone_stream.playbackState == microphone_stream.PLAYING_STATE)
+				            {
+				            	for(var i=0; i<buffer_length; i++)
+			                		_array_spectral_color[i] = get_hsv_color(array_freq_domain[i], step_hsv*i);
+			                		//console.log("_array_spectral_color ", i, " ", _array_spectral_color[i]);
+	        						
+								//console.log("div hex: ", rgb2hex(255,0,0));
+								//console.log("buffer_length ", buffer_length);
+
+				            	for(var i=0; i<numOfNodes; i++)
+								{
+									console.log("numOfNodes ", numOfNodes);
+
+									var r=0,g=0,b=0;
+									for(var j=parseInt(i*(buffer_length/numOfNodes)); j<parseInt((i+1)*(buffer_length/numOfNodes)); j++)
+									{
+										//console.log("_array_spectral_color ", j, " ", _array_spectral_color[j]);
+										//console.log("r_ ", (parseInt(_array_spectral_color[j], 16) >> 16) & 255);
+
+										var int_p = parseInt(_array_spectral_color[j], 16);
+										r += ((int_p >> 16) & 255);
+										g += ((int_p >> 8) & 255);
+										b += (int_p & 255);
+
+										//console.log("r ", r, " ", "g ", g, " ", "b ", b);
+									}
+									
+									r /= (buffer_length/numOfNodes);
+									g /= (buffer_length/numOfNodes);
+									b /= (buffer_length/numOfNodes);
+
+									array_avg_color[i] = rgb2hex(r,g,b);
+									//console.log("array_avg_color ", i, " ", array_avg_color[i]);
+								}
+
+								// send color values to server
+								//////////////////////////////
+								socket.send(array_avg_color);
+
+
+								show_fft(array_freq_domain, _array_spectral_color);
+				            }
+			            });
+			        };
+			    }
+			}
+
+		</script>
+   </body>
+</html>

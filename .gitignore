@@ -1,20 +1,20 @@
 # Frontend
 # dependencies
-/Frontend/node_modules
-/Frontend-Service/node_modules
+ws1718_old/Frontend/node_modules
+ws1718_old/Frontend-Service/node_modules
 
 # built site
-/Frontend/build
+ws1718_old/Frontend/build
 
 # testing
-/Frontend/coverage
+ws1718_old/Frontend/coverage
 
 #uploaded images
-/Frontend-Service/static/img/*.jpg
-/Frontend-Service/static/img/*.png
+ws1718_old/Frontend-Service/static/img/*.jpg
+ws1718_old/Frontend-Service/static/img/*.png
 
-#BackendSocketIO
-/BackendSocketIO/node_modules
+#Server
+Server/node_modules
 
 
 # misc
@@ -29,10 +29,13 @@ yarn-debug.log*
 yarn-error.log*
 
 #riot-examples
-riot/*/myCoapServer/.metadata/
-riot/*/myCoapServer/bin/
-riot/*/myCoapServer/.idea/
+ws1718_old/riot/*/myCoapServer/.metadata/
+ws1718_old/riot/*/myCoapServer/bin/
+ws1718_old/riot/*/myCoapServer/.idea/
 
+riot/*/microCoAP_server/.metadata/
+riot/*/microCoAP_server/bin/
+riot/*/microCoAP_server/.idea/
 
 .idea
 .vscode

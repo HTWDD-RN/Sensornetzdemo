@@ -16,6 +16,8 @@
 #endif
 #include "debug.h"
 #include "coap.h"
+#include "shell.h"
+#include "thread.h"
 
 static uint8_t _udp_buf[512];   /* udp read buffer (max udp payload size) */
 uint8_t scratch_raw[1024];      /* microcoap scratch buffer */
@@ -23,6 +25,9 @@ uint8_t scratch_raw[1024];      /* microcoap scratch buffer */
 coap_rw_buffer_t scratch_buf = { scratch_raw, sizeof(scratch_raw) };
 
 #define COAP_SERVER_PORT    (5683)
+static char *PORTSTRING = "5683";
+
+static char server_stack[THREAD_STACKSIZE_DEFAULT];
 
 /*
  * Starts a blocking and never-returning loop dispatching CoAP requests.
@@ -39,6 +44,11 @@ void microcoap_server_loop(void)
     sock_udp_t sock;
 
     int rc = sock_udp_create(&sock, &local, NULL, 0);
+
+    /* start shell */
+    puts("All up, running the shell now");
+    
+    
 
     while (1) {
         DEBUG("Waiting for incoming UDP packet...\n");
@@ -88,4 +98,9 @@ void microcoap_server_loop(void)
             }
         }
     }
+}
+
+kernel_pid_t startServer(void) {
+    return thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1,
+                      THREAD_CREATE_STACKTEST, microcoap_server_loop, PORTSTRING, "MicroCoAP Server");
 }

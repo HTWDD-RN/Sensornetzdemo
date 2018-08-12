@@ -37,9 +37,6 @@ int udp_send(char *addr, char *payload)
     }
     remote.port = GCOAP_PORT;
 
-    //printf(">>>>>> playload %s\n", payload);
-    //printf(">>>>>> addr %s\n", addr);
-
     if((res = sock_udp_send(NULL, payload, strlen(payload), &remote)) < 0) {
         puts("could not send");
     }
@@ -62,9 +59,6 @@ void *_multicast_event_loop(void *args) {
         msg_t msg;
         msg_receive(&msg);
         char *content = (char *)msg.content.value;
-
-        //printf(">>>>>> strlen content %i\n", strlen(content));
-        //printf(">>>>>> content %s\n", content);
         
         // dont send small packages, strange behaviour of Messaging IPC
         // thread receives packages smaller than 10 byte from time to time

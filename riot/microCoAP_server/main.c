@@ -18,6 +18,7 @@
  */
 
 #include <stdio.h>
+#include "shell.h"
 #include "msg.h"
 #include "xtimer.h"
 #include "periph/gpio.h"
@@ -33,7 +34,9 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 // compatibility with the Arduino IDE, we also fall back to pin 0 here, if the
 // RIOT macro is not available
 
-void microcoap_server_loop(void);
+extern kernel_pid_t startServer(void);
+
+//void microcoap_server_loop(void);
 
 /* import "ifconfig" shell command, used for printing addresses */
 extern int _netif_config(int argc, char **argv);
@@ -43,13 +46,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
   //  puts("RIOT microcoap example application");
-  //  xtimer_sleep(3);
-   // led0_blink(LED0_PIN, 3);
-   // init_out(PIN_LED_GREEN);
-    //init_out(PIN_LED_RED);
     init_out(PIN_LED_STRIP);
-    //clear(PIN_LED_RED);
-    //clear(PIN_LED_GREEN);
     clear(PIN_LED_STRIP);
     puts("SETUP successfull");
     puts("Waiting for address autoconfiguration...");
@@ -65,8 +62,16 @@ int main(void)
     printf("Turn all lights off intially…\n");
     set_simple_color(0x000000);
 
+
+    puts("Starting now microcoap server on port 5683…");
+    startServer();
     /* start coap server loop */
-    microcoap_server_loop();
+    //microcoap_server_loop();
+
+    puts("All up and running, starting interactive shell for you now ...");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+
 
     /* should be never reached */
     return 0;
